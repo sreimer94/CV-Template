@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CV Creator — Simon Reimer</title>
 <style>
-:root { --p:#00b4a0; --pd:#007a6e; --dark:#1e2a3a; --mid:#5a6a7a; --light:#8090a0; --border:#d8e3ec; --bg:#f4f7fa; --orange:#e8920a; --sidebar-w:238px; --fs-hdr:1; --fs-profile:1; --fs-left:1; --fs-right:1; --fs-skills:1; --fs-langs:1; --fs-certs:1; --fs-exp:1; --fs-edu:1; --spacing-r:1; --spacing-l:1; }
+:root { --p:#00b4a0; --pd:#007a6e; --dark:#1e2a3a; --mid:#5a6a7a; --light:#8090a0; --border:#d8e3ec; --bg:#f4f7fa; --orange:#e8920a; --sidebar-w:238px; --fs-hdr:1; --fs-hdr-name:1; --fs-hdr-contact:1; --fs-profile:1; --fs-left:1; --fs-right:1; --fs-skills:1; --fs-langs:1; --fs-certs:1; --fs-exp:1; --fs-edu:1; --spacing-r:1; --spacing-l:1; }
 /* COLOR EDITOR */
 .color-section{margin-bottom:18px;}
 .color-section-title{font-size:.68em;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border);}
@@ -89,10 +89,10 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#1a2332;color:var(--
 .cv-hdr{display:flex;align-items:center;padding:16px 26px 14px;gap:16px;border-bottom:1px solid #e8edf4;font-size:calc(16px * var(--fs-hdr));}
 .cv-photo{width:78px;height:78px;border-radius:50%;border:3px solid var(--p);object-fit:cover;flex-shrink:0;}
 .cv-photo-ph{width:78px;height:78px;border-radius:50%;border:3px solid var(--p);background:#e8edf4;display:flex;align-items:center;justify-content:center;font-size:1.8em;flex-shrink:0;}
-.cv-hdr-mid{flex:1;padding-left:4px;}
+.cv-hdr-mid{flex:1;padding-left:4px;font-size:calc(1em * var(--fs-hdr-name));}
 .cv-hdr-name{font-size:1.78em;font-weight:700;color:var(--dark);line-height:1.12;}
 .cv-hdr-title{font-size:.62em;font-weight:700;color:var(--p);letter-spacing:3.5px;text-transform:uppercase;margin-top:4px;}
-.cv-hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;}
+.cv-hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;font-size:calc(1em * var(--fs-hdr-contact));}
 .cv-ci{display:flex;align-items:center;gap:6px;font-size:.67em;color:var(--mid);}
 .cv-ci i{font-style:normal;display:flex;align-items:center;flex-shrink:0;}
 .cv-ci i svg{display:block;}
@@ -100,8 +100,7 @@ a.cv-ci{color:inherit;text-decoration:none;}
 a.cv-ci:hover{opacity:.8;text-decoration:underline;}
 
 /* About Me bar */
-.cv-about{padding:9px 22px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
-.cv-about-qt{font-size:1.7em;color:rgba(255,255,255,.26);font-family:Georgia,serif;line-height:1;flex-shrink:0;font-style:normal;}
+.cv-about{padding:9px 22px;display:flex;align-items:center;flex-shrink:0;}
 .cv-about-body{flex:1;min-width:0;}
 .cv-about-lbl{font-size:calc(.44em * var(--fs-profile));font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:2px;}
 .cv-about-txt{font-size:calc(.74em * var(--fs-profile));color:rgba(255,255,255,.93);font-style:italic;line-height:1.5;}
@@ -111,7 +110,7 @@ a.cv-ci:hover{opacity:.8;text-decoration:underline;}
 
 /* Left */
 .cv-left{width:var(--sidebar-w);flex-shrink:0;padding:16px 14px 16px 18px;border-right:1px solid #e8edf4;font-size:calc(16px * var(--fs-left));overflow:hidden;}
-.cv-sh{font-size:.57em;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--p);margin-bottom:7px;padding-bottom:4px;border-bottom:2px solid var(--p);}
+/* .cv-sh kept for backwards compat but replaced by .cv-msh in sidebar */
 .cv-mod+.cv-mod{margin-top:calc(12px * var(--spacing-l));}
 .cv-skgrp{margin-bottom:8px;}
 .cv-skgrp-lbl{font-size:.55em;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--light);margin-bottom:3px;}
@@ -368,7 +367,7 @@ const TR={
 };
 
 let lang='en', tab='personal', editorOpen=true, parsedData=null;
-let LAYOUT={sidebarWidth:234, fsHeader:100, fsProfile:100, fsLeft:100, fsRight:100, fsSkills:100, fsLangs:100, fsCerts:100, fsExp:100, fsEdu:100, spacingR:100, spacingL:100};
+let LAYOUT={sidebarWidth:234, fsHeader:100, fsHdrName:100, fsHdrContact:100, fsProfile:100, fsLeft:100, fsRight:100, fsSkills:100, fsLangs:100, fsCerts:100, fsExp:100, fsEdu:100, spacingR:100, spacingL:100};
 
 function fitCV(){
   const pp=document.getElementById('pp');
@@ -387,6 +386,8 @@ function applyLayout(){
   const r=document.documentElement.style;
   r.setProperty('--sidebar-w',LAYOUT.sidebarWidth+'px');
   r.setProperty('--fs-hdr',LAYOUT.fsHeader/100);
+  r.setProperty('--fs-hdr-name',LAYOUT.fsHdrName/100);
+  r.setProperty('--fs-hdr-contact',LAYOUT.fsHdrContact/100);
   r.setProperty('--fs-profile',LAYOUT.fsProfile/100);
   r.setProperty('--fs-left',LAYOUT.fsLeft/100);
   r.setProperty('--fs-right',LAYOUT.fsRight/100);
@@ -562,24 +563,23 @@ function renderCV(){
       <div class="cv-hdr-right">${contact}</div>
     </div>
     <div class="cv-about" style="background:linear-gradient(135deg,${COLORS.dark} 0%,${COLORS.primary} 100%)">
-      <div class="cv-about-qt">❝</div>
       <div class="cv-about-body">
         <div class="cv-about-lbl">${tr.profile}</div>
-        <div class="cv-about-txt">${esc(profileText)}</div>
+        <div class="cv-about-txt" style="font-style:${d.profileItalic===false?'normal':'italic'}">${esc(profileText)}</div>
       </div>
     </div>
     <div class="cv-body">
       <div class="cv-left">
         <div class="cv-mod" style="font-size:calc(1em*var(--fs-skills))">
-          <div class="cv-sh">${tr.skills}</div>
+          <div class="cv-msh"><span class="cv-msh-icon">▶</span><span class="cv-msh-title">${tr.skills}</span></div>
           ${skillGroups}
         </div>
         <div class="cv-mod" style="font-size:calc(1em*var(--fs-langs))">
-          <div class="cv-sh">${tr.languages}</div>
+          <div class="cv-msh"><span class="cv-msh-icon">▶</span><span class="cv-msh-title">${tr.languages}</span></div>
           ${langs}
         </div>
         <div class="cv-mod" style="font-size:calc(1em*var(--fs-certs))">
-          <div class="cv-sh">${tr.certificates}</div>
+          <div class="cv-msh"><span class="cv-msh-icon">▶</span><span class="cv-msh-title">${tr.certificates}</span></div>
           ${certs}
         </div>
       </div>
@@ -662,7 +662,13 @@ const EH={
       <button class="addbtn" onclick="D.certificates.push({title:'New Certificate',issuer:'Issuer',date:'2025'});renderEditor();renderCV()">+ Add Certificate</button>`;
   },
   profile(){
-    return `<div class="fg"><label>Profile / Summary</label><textarea style="min-height:180px" oninput="D.profile=this.value;renderCV()">${esc(D.profile)}</textarea></div>`;
+    const isItalic=D.profileItalic!==false;
+    return `
+      <div class="fg"><label>Profile / Summary</label><textarea style="min-height:160px" oninput="D.profile=this.value;renderCV()">${esc(D.profile)}</textarea></div>
+      <label class="chk-row">
+        <input type="checkbox" ${isItalic?'checked':''} onchange="D.profileItalic=this.checked;renderCV()">
+        Italic text
+      </label>`;
   },
   experience(){
     return `<div>${D.experience.map((e,i)=>`
@@ -762,7 +768,9 @@ EH.layout=function(){
     </div>
     <div class="color-section">
       <div class="color-section-title">Header</div>
-      ${sl('fsHeader','Header Font',60,140,5,'%')}
+      ${sl('fsHeader','⬜ Header (master)',60,140,5,'%')}
+      ${sl('fsHdrName','  ↳ Name & Title',60,140,5,'%')}
+      ${sl('fsHdrContact','  ↳ Contact Info',60,140,5,'%')}
       ${sl('fsProfile','About Me Font',60,140,5,'%')}
     </div>
     <div class="color-section">
@@ -1034,7 +1042,7 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'),2200);
 }
 function resetLayout(){
-  LAYOUT={sidebarWidth:234,fsHeader:100,fsProfile:100,fsLeft:100,fsRight:100,fsSkills:100,fsLangs:100,fsCerts:100,fsExp:100,fsEdu:100,spacingR:100,spacingL:100};
+  LAYOUT={sidebarWidth:234,fsHeader:100,fsHdrName:100,fsHdrContact:100,fsProfile:100,fsLeft:100,fsRight:100,fsSkills:100,fsLangs:100,fsCerts:100,fsExp:100,fsEdu:100,spacingR:100,spacingL:100};
   applyLayout();
   if(tab==='layout') renderEditor();
 }
