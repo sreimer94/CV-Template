@@ -99,11 +99,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#1a2332;color:var(--
 a.cv-ci{color:inherit;text-decoration:none;}
 a.cv-ci:hover{opacity:.8;text-decoration:underline;}
 
-/* Profile bar */
-.cv-pbar{padding:7px 22px;display:flex;align-items:center;background:#f0f5ff;border-top:1px solid #ccd8f0;border-bottom:1px solid #ccd8f0;flex-shrink:0;}
-.cv-pbar-body{flex:1;min-width:0;}
-.cv-pbar-lbl{font-size:calc(.42em * var(--fs-profile));font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--mid);margin-bottom:2px;}
-.cv-pbar-txt{font-size:calc(.71em * var(--fs-profile));color:var(--dark);line-height:1.45;}
+/* Profile bar - compact single line */
+.cv-pbar{padding:0 22px;display:flex;align-items:center;background:#f0f5ff;border-top:1px solid #ccd8f0;border-bottom:1px solid #ccd8f0;flex-shrink:0;height:calc(36px * var(--fs-profile));overflow:hidden;}
+.cv-pbar-body{flex:1;min-width:0;display:flex;align-items:center;gap:8px;}
+.cv-pbar-lbl{font-size:calc(.4em * var(--fs-profile));font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--mid);white-space:nowrap;flex-shrink:0;}
+.cv-pbar-txt{font-size:calc(.68em * var(--fs-profile));color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;}
 
 /* Body */
 .cv-body{display:flex;flex:1;overflow:hidden;}
@@ -131,8 +131,6 @@ a.cv-ci:hover{opacity:.8;text-decoration:underline;}
 .cv-msh{display:flex;align-items:center;gap:8px;padding:10px 20px 0;margin-bottom:8px;}
 .cv-msh-icon{font-size:.75em;color:var(--orange);flex-shrink:0;}
 .cv-msh-title{font-size:.59em;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--dark);flex:1;padding-bottom:5px;border-bottom:1px solid #e0e8f0;}
-.cv-msh-exp{background:var(--dark);padding:8px 20px;margin-bottom:8px;}
-.cv-msh-exp-title{font-size:.58em;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:white;}
 .cv-exp-list{padding:0 20px;}
 .cv-exp-entry{display:flex;margin-bottom:calc(10px * var(--spacing-r));}
 .cv-exp-bar{width:3px;border-radius:2px;flex-shrink:0;margin-right:11px;}
@@ -187,6 +185,7 @@ a.cv-ci:hover{opacity:.8;text-decoration:underline;}
 
 /* PRINT */
 @media print{
+  *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;}
   body{background:white !important;overflow:visible !important;height:auto !important;}
   #tb,#ep,#etoggle,#itmodal{display:none !important;}
   #main{height:auto !important;overflow:visible !important;}
@@ -277,8 +276,10 @@ let D = {
     email:"sreimer94@gmail.com",
     phone:"+41 79 785 52 65",
     base:"Freiburg / Renens · CH",
-    linkedin:"https://www.linkedin.com/in/simon-reimer-08676a169/",
+    linkedin:"simon-reimer-08676a169",
+    linkedinUrl:"https://www.linkedin.com/in/simon-reimer-08676a169/",
     github:"sreimer94",
+    githubUrl:"https://github.com/sreimer94",
     photo:"1758657829217.jpg"
   },
   skills:{
@@ -371,7 +372,7 @@ const TR={
 };
 
 let lang='en', tab='personal', editorOpen=true, parsedData=null;
-let LAYOUT={sidebarWidth:234, fsHeader:100, fsHdrName:100, fsHdrContact:100, fsProfile:100, fsLeft:100, fsRight:100, fsSkills:100, fsLangs:100, fsCerts:100, fsExp:100, fsEdu:100, spacingR:100, spacingL:100};
+let LAYOUT={sidebarWidth:219, fsHeader:100, fsHdrName:100, fsHdrContact:100, fsProfile:100, fsLeft:100, fsRight:100, fsSkills:100, fsLangs:100, fsCerts:100, fsExp:100, fsEdu:100, spacingR:100, spacingL:100};
 
 function fitCV(){
   const pp=document.getElementById('pp');
@@ -486,12 +487,10 @@ function renderCV(){
     :'';
   const telHref=d.personal.phone?`tel:${d.personal.phone.replace(/\s/g,'')}`:'';
   const mapsHref=d.personal.base?`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(d.personal.base)}`:'';
-  const liRaw=d.personal.linkedin||'';
-  const liHref=liRaw?(liRaw.startsWith('http')?liRaw:`https://www.linkedin.com/in/${liRaw}/`):'';
-  const liDisplay=liRaw?(liRaw.startsWith('http')?(liRaw.match(/\/in\/([^/?#]+)/)?.[1]||liRaw):liRaw):'';
-  const ghRaw=d.personal.github||'';
-  const ghHref=ghRaw?(ghRaw.startsWith('http')?ghRaw:`https://github.com/${ghRaw}`):'';
-  const ghDisplay=ghRaw?(ghRaw.startsWith('http')?(ghRaw.match(/github\.com\/([^/?#]+)/)?.[1]||ghRaw):ghRaw):'';
+  const liDisplay=d.personal.linkedin||'';
+  const liHref=d.personal.linkedinUrl||(liDisplay?`https://www.linkedin.com/in/${liDisplay}/`:'');
+  const ghDisplay=d.personal.github||'';
+  const ghHref=d.personal.githubUrl||(ghDisplay?`https://github.com/${ghDisplay}`:'');
   const contact=[
     ci(ICONS.email,    d.personal.email,    d.personal.email?`mailto:${d.personal.email}`:''),
     ci(ICONS.phone,    d.personal.phone,    telHref),
@@ -595,9 +594,7 @@ function renderCV(){
       </div>
       <div class="cv-right">
         <div class="cv-mod" style="font-size:calc(1em*var(--fs-exp))">
-          <div class="cv-msh-exp">
-            <span class="cv-msh-exp-title">${tr.experience}</span>
-          </div>
+          <div class="cv-msh"><span class="cv-msh-icon">▶</span><span class="cv-msh-title">${tr.experience}</span></div>
           <div class="cv-exp-list">${exp}</div>
         </div>
         <div class="cv-mod" style="font-size:calc(1em*var(--fs-edu));margin-top:calc(10px*var(--spacing-r))">
@@ -633,8 +630,14 @@ const EH={
       <div class="fg"><label>Email</label><input type="email" value="${esc(p.email)}" oninput="D.personal.email=this.value;renderCV()"></div>
       <div class="fg"><label>Phone</label><input type="tel" value="${esc(p.phone)}" oninput="D.personal.phone=this.value;renderCV()"></div>
       <div class="fg"><label>Base Location</label><input value="${esc(p.base)}" oninput="D.personal.base=this.value;renderCV()"></div>
-      <div class="fg"><label>LinkedIn (URL or username)</label><input placeholder="https://www.linkedin.com/in/…" value="${esc(p.linkedin)}" oninput="D.personal.linkedin=this.value;renderCV()"></div>
-      <div class="fg"><label>GitHub (URL or username)</label><input placeholder="https://github.com/…" value="${esc(p.github)}" oninput="D.personal.github=this.value;renderCV()"></div>`;
+      <div class="g2">
+        <div class="fg" style="margin:0"><label>LinkedIn (Anzeigetext)</label><input placeholder="Benutzername" value="${esc(p.linkedin)}" oninput="D.personal.linkedin=this.value;renderCV()"></div>
+        <div class="fg" style="margin:0"><label>LinkedIn URL</label><input placeholder="https://www.linkedin.com/in/…" value="${esc(p.linkedinUrl||'')}" oninput="D.personal.linkedinUrl=this.value;renderCV()"></div>
+      </div>
+      <div class="g2" style="margin-top:8px">
+        <div class="fg" style="margin:0"><label>GitHub (Anzeigetext)</label><input placeholder="Benutzername" value="${esc(p.github)}" oninput="D.personal.github=this.value;renderCV()"></div>
+        <div class="fg" style="margin:0"><label>GitHub URL</label><input placeholder="https://github.com/…" value="${esc(p.githubUrl||'')}" oninput="D.personal.githubUrl=this.value;renderCV()"></div>
+      </div>`;
   },
   skills(){
     return ['technical','tools','domain','soft'].map(k=>`
@@ -1048,7 +1051,7 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'),2200);
 }
 function resetLayout(){
-  LAYOUT={sidebarWidth:234,fsHeader:100,fsHdrName:100,fsHdrContact:100,fsProfile:100,fsLeft:100,fsRight:100,fsSkills:100,fsLangs:100,fsCerts:100,fsExp:100,fsEdu:100,spacingR:100,spacingL:100};
+  LAYOUT={sidebarWidth:219,fsHeader:100,fsHdrName:100,fsHdrContact:100,fsProfile:100,fsLeft:100,fsRight:100,fsSkills:100,fsLangs:100,fsCerts:100,fsExp:100,fsEdu:100,spacingR:100,spacingL:100};
   applyLayout();
   if(tab==='layout') renderEditor();
 }
