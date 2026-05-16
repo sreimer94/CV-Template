@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CV Creator — Simon Reimer</title>
 <style>
-:root { --p:#00b4a0; --pd:#007a6e; --dark:#1e2a3a; --mid:#5a6a7a; --light:#8090a0; --border:#d8e3ec; --bg:#f4f7fa; --orange:#e8920a; --sidebar-w:238px; --fs-hdr:1; --fs-hdr-name:1; --fs-hdr-contact:1; --fs-profile:1; --fs-left:1; --fs-right:1; --fs-skills:1; --fs-langs:1; --fs-certs:1; --fs-exp:1; --fs-edu:1; --spacing-r:1; --spacing-l:1; }
+:root { --p:#00b4a0; --pd:#007a6e; --dark:#1e2a3a; --mid:#5a6a7a; --light:#8090a0; --border:#d8e3ec; --bg:#f4f7fa; --orange:#e8920a; --edu:#10b981; --sidebar-w:238px; --fs-hdr:1; --fs-hdr-name:1; --fs-hdr-contact:1; --fs-profile:1; --fs-left:1; --fs-right:1; --fs-skills:1; --fs-langs:1; --fs-certs:1; --fs-exp:1; --fs-edu:1; --spacing-r:1; --spacing-l:1; }
 /* COLOR EDITOR */
 .color-section{margin-bottom:18px;}
 .color-section-title{font-size:.68em;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border);}
@@ -121,10 +121,10 @@ a.cv-ci:hover{opacity:.8;text-decoration:underline;}
 .cv-lang-lvl{font-size:.55em;font-weight:700;letter-spacing:1px;color:var(--orange);text-transform:uppercase;}
 .cv-lang-bar{height:3px;background:rgba(255,255,255,.18);border-radius:2px;}
 .cv-lang-fill{height:100%;border-radius:2px;}
-.cv-cert-card{background:var(--orange);border-radius:4px;padding:6px 9px;margin-bottom:5px;}
+.cv-cert-card{background:var(--orange);border-radius:4px;padding:7px 10px;margin-bottom:5px;}
 .cv-cert-ttl{font-size:.67em;font-weight:700;color:white;line-height:1.3;}
-.cv-cert-iss{font-size:.57em;color:rgba(255,255,255,.78);line-height:1.3;margin-top:2px;}
-.cv-cert-dt{font-size:.56em;font-weight:700;color:rgba(255,255,255,.92);margin-top:2px;}
+.cv-cert-iss{font-size:.55em;color:rgba(255,255,255,.72);line-height:1.25;margin-top:3px;font-style:italic;}
+.cv-cert-dt{font-size:.53em;font-weight:700;color:white;margin-top:5px;padding-top:4px;border-top:1px solid rgba(255,255,255,.25);letter-spacing:.5px;}
 
 /* Right column */
 .cv-right{flex:1;padding:0;font-size:calc(15px * var(--fs-right));overflow:hidden;}
@@ -147,10 +147,10 @@ a.cv-ci:hover{opacity:.8;text-decoration:underline;}
 .cv-bul{display:flex;align-items:flex-start;gap:4px;font-size:.65em;color:#3a5068;margin-bottom:1px;line-height:1.38;}
 .cv-bul-arr{color:var(--p);flex-shrink:0;}
 .cv-edu-list{padding:0 18px 12px;}
-.cv-edu-card{background:var(--p);border-radius:5px;padding:7px 11px;margin-bottom:5px;}
-.cv-edu-dt{font-size:.54em;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;}
-.cv-edu-deg{font-size:.74em;font-weight:700;color:white;line-height:1.22;}
-.cv-edu-sch{font-size:.66em;color:rgba(255,255,255,.8);margin-top:2px;}
+.cv-edu-card{background:var(--edu);border-radius:5px;padding:8px 12px;margin-bottom:5px;}
+.cv-edu-dt{font-size:.52em;font-weight:700;color:rgba(255,255,255,.78);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px;}
+.cv-edu-deg{font-size:.76em;font-weight:700;color:white;line-height:1.2;}
+.cv-edu-sch{font-size:.64em;color:rgba(255,255,255,.82);margin-top:3px;font-style:italic;}
 
 /* IMPORT MODAL */
 #itmodal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2000;align-items:center;justify-content:center;}
@@ -408,12 +408,12 @@ function applyLayout(){
 }
 // ── THEME SYSTEM ──────────────────────────────────────────────────────────────
 const THEMES={
-  se:     {name:'SE',     primary:'#6929c4',accent:'#a352cc',dark:'#1d1741',mid:'#4a3870',light:'#8870a8',bg:'#f4f1f9',border:'#d0c8e8',card:'#ebe6f5',langs:['#1d1741','#6929c4','#c47f00','#8870a8']},
-  teal:   {name:'Teal',   primary:'#00b4a0',accent:'#e8920a',dark:'#1e2a3a',mid:'#5a6a7a',light:'#8090a0',bg:'#f4f7fa',border:'#d8e3ec',card:'#f0f8f7',langs:['#1e2a3a','#00b4a0','#48a090','#8aa0b0']},
-  navy:   {name:'Navy',   primary:'#1a5f9e',accent:'#e8920a',dark:'#0d2340',mid:'#4a6080',light:'#7090a8',bg:'#f0f4f8',border:'#c8d8e8',card:'#eaf2f8',langs:['#0d2340','#1a5f9e','#2a80c0','#7aa0c0']},
-  forest: {name:'Forest', primary:'#2d7a4a',accent:'#b07820',dark:'#1a3020',mid:'#4a6050',light:'#7a9080',bg:'#f0f5f0',border:'#c0d8c0',card:'#eaf4ec',langs:['#1a3020','#2d7a4a','#40a060','#80b090']},
-  wine:   {name:'Wine',   primary:'#8b2252',accent:'#d4702a',dark:'#2d0a18',mid:'#6a3a50',light:'#9a6a80',bg:'#f8f0f4',border:'#e0c8d0',card:'#f8eaf0',langs:['#2d0a18','#8b2252','#b03870','#c08090']},
-  slate:  {name:'Slate',  primary:'#4a6a8a',accent:'#c08030',dark:'#1a2830',mid:'#4a5a68',light:'#7a8898',bg:'#f2f4f6',border:'#c8d0da',card:'#edf0f4',langs:['#1a2830','#4a6a8a','#6a90a8','#9ab0c0']}
+  se:     {name:'SE',     primary:'#6929c4',accent:'#a352cc',dark:'#1d1741',mid:'#4a3870',light:'#8870a8',bg:'#f4f1f9',border:'#d0c8e8',card:'#ebe6f5',edu:'#10b981',langs:['#1d1741','#6929c4','#c47f00','#8870a8']},
+  teal:   {name:'Teal',   primary:'#00b4a0',accent:'#e8920a',dark:'#1e2a3a',mid:'#5a6a7a',light:'#8090a0',bg:'#f4f7fa',border:'#d8e3ec',card:'#f0f8f7',edu:'#0891b2',langs:['#1e2a3a','#00b4a0','#48a090','#8aa0b0']},
+  navy:   {name:'Navy',   primary:'#1a5f9e',accent:'#e8920a',dark:'#0d2340',mid:'#4a6080',light:'#7090a8',bg:'#f0f4f8',border:'#c8d8e8',card:'#eaf2f8',edu:'#059669',langs:['#0d2340','#1a5f9e','#2a80c0','#7aa0c0']},
+  forest: {name:'Forest', primary:'#2d7a4a',accent:'#b07820',dark:'#1a3020',mid:'#4a6050',light:'#7a9080',bg:'#f0f5f0',border:'#c0d8c0',card:'#eaf4ec',edu:'#0891b2',langs:['#1a3020','#2d7a4a','#40a060','#80b090']},
+  wine:   {name:'Wine',   primary:'#8b2252',accent:'#d4702a',dark:'#2d0a18',mid:'#6a3a50',light:'#9a6a80',bg:'#f8f0f4',border:'#e0c8d0',card:'#f8eaf0',edu:'#0f766e',langs:['#2d0a18','#8b2252','#b03870','#c08090']},
+  slate:  {name:'Slate',  primary:'#4a6a8a',accent:'#c08030',dark:'#1a2830',mid:'#4a5a68',light:'#7a8898',bg:'#f2f4f6',border:'#c8d0da',card:'#edf0f4',edu:'#10b981',langs:['#1a2830','#4a6a8a','#6a90a8','#9ab0c0']}
 };
 
 let COLORS={...THEMES.se};
@@ -432,6 +432,7 @@ function applyColors(){
   r.setProperty('--mid',COLORS.mid);
   r.setProperty('--light',COLORS.light);
   r.setProperty('--orange',COLORS.accent);
+  r.setProperty('--edu',COLORS.edu||'#10b981');
   r.setProperty('--bg',COLORS.bg);
   r.setProperty('--border',COLORS.border);
   renderCV();
@@ -672,12 +673,20 @@ const EH={
   },
   profile(){
     const isItalic=D.profileItalic!==false;
+    const fsP=LAYOUT.fsProfile||100;
     return `
       <div class="fg"><label>Profile / Summary</label><textarea style="min-height:160px" oninput="D.profile=this.value;renderCV()">${esc(D.profile)}</textarea></div>
       <label class="chk-row">
         <input type="checkbox" ${isItalic?'checked':''} onchange="D.profileItalic=this.checked;renderCV()">
         Italic text
-      </label>`;
+      </label>
+      <div class="sdiv">Schriftgröße</div>
+      <div class="slider-row">
+        <label>Profile Größe</label>
+        <input type="range" min="60" max="140" step="5" value="${fsP}"
+          oninput="LAYOUT.fsProfile=+this.value;document.getElementById('slv-pfs').textContent=this.value+'%';applyLayout()">
+        <span class="slider-val" id="slv-pfs">${fsP}%</span>
+      </div>`;
   },
   experience(){
     return `<div>${D.experience.map((e,i)=>`
@@ -748,9 +757,12 @@ EH.colors=function(){
       ${colorRow('light','Secondary Text')}
     </div>
     <div class="color-section">
+      <div class="color-section-title">Card Colors</div>
+      ${colorRow('edu','Education Cards')}
+    </div>
+    <div class="color-section">
       <div class="color-section-title">Background & Borders</div>
       ${colorRow('bg','Page Background')}
-      ${colorRow('card','Profile Bar / Cards')}
       ${colorRow('border','Borders')}
     </div>
     <div class="color-section">
@@ -1063,14 +1075,24 @@ function saveData(){
     showToast('💾 Saved to browser storage');
   }catch(e){showToast('⚠ Save failed: '+e.message);}
 }
+function validateLayout(saved){
+  const defs={sidebarWidth:219,fsHeader:100,fsHdrName:100,fsHdrContact:100,fsProfile:100,fsLeft:100,fsRight:100,fsSkills:100,fsLangs:100,fsCerts:100,fsExp:100,fsEdu:100,spacingR:100,spacingL:100};
+  const mins={sidebarWidth:120,fsHeader:50,fsHdrName:50,fsHdrContact:50,fsProfile:50,fsLeft:50,fsRight:50,fsSkills:50,fsLangs:50,fsCerts:50,fsExp:50,fsEdu:50,spacingR:40,spacingL:40};
+  const out={};
+  for(const k of Object.keys(defs)){
+    const v=parseFloat(saved[k]);
+    out[k]=(isFinite(v)&&v>=(mins[k]||1))?v:defs[k];
+  }
+  return out;
+}
 function loadData(){
   try{
     const d=localStorage.getItem('cvData');
     const l=localStorage.getItem('cvLayout');
     const c=localStorage.getItem('cvColors');
     if(d) D=JSON.parse(d);
-    if(l) LAYOUT=JSON.parse(l);
-    if(c) COLORS=JSON.parse(c);
+    if(l) LAYOUT=validateLayout(JSON.parse(l));
+    if(c){ COLORS={...THEMES.se,...JSON.parse(c)}; }
   }catch(e){console.warn('Load failed',e);}
 }
 
