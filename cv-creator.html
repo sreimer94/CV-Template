@@ -277,7 +277,7 @@ let D = {
     email:"sreimer94@gmail.com",
     phone:"+41 79 785 52 65",
     base:"Freiburg / Renens · CH",
-    linkedin:"simon-reimer-08676a169",
+    linkedin:"https://www.linkedin.com/in/simon-reimer-08676a169/",
     github:"sreimer94",
     photo:"1758657829217.jpg"
   },
@@ -486,12 +486,18 @@ function renderCV(){
     :'';
   const telHref=d.personal.phone?`tel:${d.personal.phone.replace(/\s/g,'')}`:'';
   const mapsHref=d.personal.base?`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(d.personal.base)}`:'';
+  const liRaw=d.personal.linkedin||'';
+  const liHref=liRaw?(liRaw.startsWith('http')?liRaw:`https://www.linkedin.com/in/${liRaw}/`):'';
+  const liDisplay=liRaw?(liRaw.startsWith('http')?(liRaw.match(/\/in\/([^/?#]+)/)?.[1]||liRaw):liRaw):'';
+  const ghRaw=d.personal.github||'';
+  const ghHref=ghRaw?(ghRaw.startsWith('http')?ghRaw:`https://github.com/${ghRaw}`):'';
+  const ghDisplay=ghRaw?(ghRaw.startsWith('http')?(ghRaw.match(/github\.com\/([^/?#]+)/)?.[1]||ghRaw):ghRaw):'';
   const contact=[
     ci(ICONS.email,    d.personal.email,    d.personal.email?`mailto:${d.personal.email}`:''),
     ci(ICONS.phone,    d.personal.phone,    telHref),
     ci(ICONS.location, d.personal.base,     mapsHref),
-    ci(ICONS.linkedin, d.personal.linkedin, d.personal.linkedin?`https://www.linkedin.com/in/${d.personal.linkedin}/`:''),
-    ci(ICONS.github,   d.personal.github,   d.personal.github?`https://github.com/${d.personal.github}`:'')
+    ci(ICONS.linkedin, liDisplay,           liHref),
+    ci(ICONS.github,   ghDisplay,           ghHref)
   ].join('');
 
   const skillGroups=[
@@ -627,8 +633,8 @@ const EH={
       <div class="fg"><label>Email</label><input type="email" value="${esc(p.email)}" oninput="D.personal.email=this.value;renderCV()"></div>
       <div class="fg"><label>Phone</label><input type="tel" value="${esc(p.phone)}" oninput="D.personal.phone=this.value;renderCV()"></div>
       <div class="fg"><label>Base Location</label><input value="${esc(p.base)}" oninput="D.personal.base=this.value;renderCV()"></div>
-      <div class="fg"><label>LinkedIn (username)</label><input value="${esc(p.linkedin)}" oninput="D.personal.linkedin=this.value;renderCV()"></div>
-      <div class="fg"><label>GitHub (username)</label><input value="${esc(p.github)}" oninput="D.personal.github=this.value;renderCV()"></div>`;
+      <div class="fg"><label>LinkedIn (URL or username)</label><input placeholder="https://www.linkedin.com/in/…" value="${esc(p.linkedin)}" oninput="D.personal.linkedin=this.value;renderCV()"></div>
+      <div class="fg"><label>GitHub (URL or username)</label><input placeholder="https://github.com/…" value="${esc(p.github)}" oninput="D.personal.github=this.value;renderCV()"></div>`;
   },
   skills(){
     return ['technical','tools','domain','soft'].map(k=>`
