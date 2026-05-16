@@ -120,7 +120,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#1a2332;color:var(--
 .cv-lang-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px;}
 .cv-lang-name{font-size:.72em;color:var(--dark);}
 .cv-lang-lvl{font-size:.55em;font-weight:700;letter-spacing:1px;color:var(--p);text-transform:uppercase;}
-.cv-lang-bar{height:3px;background:#e0e8f0;border-radius:2px;}
+.cv-lang-bar{height:4px;background:#e0e8f0;border-radius:2px;}
 .cv-lang-fill{height:100%;border-radius:2px;}
 .cv-cert-card{background:#f4f7fa;border-radius:5px;padding:6px 9px;margin-bottom:5px;border-left:3px solid var(--orange);}
 .cv-cert-ttl{font-size:.67em;font-weight:600;color:var(--dark);line-height:1.3;}
@@ -401,7 +401,7 @@ function applyLayout(){
 }
 // ── THEME SYSTEM ──────────────────────────────────────────────────────────────
 const THEMES={
-  se:     {name:'SE',     primary:'#6929c4',accent:'#a352cc',dark:'#1d1741',mid:'#4a3870',light:'#8870a8',bg:'#f4f1f9',border:'#d0c8e8',card:'#ebe6f5',langs:['#1d1741','#6929c4','#a352cc','#c8aaf0']},
+  se:     {name:'SE',     primary:'#6929c4',accent:'#a352cc',dark:'#1d1741',mid:'#4a3870',light:'#8870a8',bg:'#f4f1f9',border:'#d0c8e8',card:'#ebe6f5',langs:['#1d1741','#6929c4','#c47f00','#8870a8']},
   teal:   {name:'Teal',   primary:'#00b4a0',accent:'#e8920a',dark:'#1e2a3a',mid:'#5a6a7a',light:'#8090a0',bg:'#f4f7fa',border:'#d8e3ec',card:'#f0f8f7',langs:['#1e2a3a','#00b4a0','#48a090','#8aa0b0']},
   navy:   {name:'Navy',   primary:'#1a5f9e',accent:'#e8920a',dark:'#0d2340',mid:'#4a6080',light:'#7090a8',bg:'#f0f4f8',border:'#c8d8e8',card:'#eaf2f8',langs:['#0d2340','#1a5f9e','#2a80c0','#7aa0c0']},
   forest: {name:'Forest', primary:'#2d7a4a',accent:'#b07820',dark:'#1a3020',mid:'#4a6050',light:'#7a9080',bg:'#f0f5f0',border:'#c0d8c0',card:'#eaf4ec',langs:['#1a3020','#2d7a4a','#40a060','#80b090']},
@@ -475,11 +475,11 @@ function renderCV(){
   const photoPh=`<div class="cv-photo-ph" ${d.personal.photo?'style="display:none"':''}>👤</div>`;
 
   const ci=(icon,val,href)=>val?`<div class="cv-ci"><i>${icon}</i>${href?`<a href="${href}" target="_blank" rel="noopener" class="cv-link">${esc(val)}</a>`:esc(val)}</div>`:'';
-  const teamsHref=d.personal.phone?`https://teams.microsoft.com/l/call/0/0?users=${encodeURIComponent(d.personal.phone)}`:'';
+  const telHref=d.personal.phone?`tel:${d.personal.phone.replace(/\s/g,'')}`:'';
   const mapsHref=d.personal.base?`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(d.personal.base)}`:'';
   const contact=[
     ci(ICONS.email,    d.personal.email,    d.personal.email?`mailto:${d.personal.email}`:''),
-    ci(ICONS.phone,    d.personal.phone,    teamsHref),
+    ci(ICONS.phone,    d.personal.phone,    telHref),
     ci(ICONS.location, d.personal.base,     mapsHref),
     ci(ICONS.linkedin, d.personal.linkedin, d.personal.linkedin?`https://www.linkedin.com/in/${d.personal.linkedin}/`:''),
     ci(ICONS.github,   d.personal.github,   d.personal.github?`https://github.com/${d.personal.github}`:'')
@@ -496,16 +496,20 @@ function renderCV(){
       <div class="cv-skgrp-tags">${g.items.map(s=>esc(s)).join(' · ')}</div>
     </div>`).join('');
 
-  const langs=d.languages.map((l,i)=>`
+  const langPalette=[COLORS.dark,COLORS.primary,COLORS.accent,COLORS.mid,COLORS.light];
+  const langs=d.languages.map((l,i)=>{
+    const lc=(COLORS.langs&&COLORS.langs[i]!=null)?COLORS.langs[i]:langPalette[i%langPalette.length];
+    return `
     <div class="cv-lang-item">
       <div class="cv-lang-row">
         <span class="cv-lang-name">${esc(l.name)}</span>
-        <span class="cv-lang-lvl">${l.level==='Native'?tr.native:esc(l.level)}</span>
+        <span class="cv-lang-lvl" style="color:${lc}">${l.level==='Native'?tr.native:esc(l.level)}</span>
       </div>
       <div class="cv-lang-bar">
-        <div class="cv-lang-fill" style="width:${lvlPct(l.level)}%;background:${(COLORS.langs||LANG_COLORS)[i%(COLORS.langs||LANG_COLORS).length]}"></div>
+        <div class="cv-lang-fill" style="width:${lvlPct(l.level)}%;background:${lc}"></div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 
   const certs=d.certificates.map(c=>`
     <div class="cv-cert-card">
@@ -517,7 +521,7 @@ function renderCV(){
   const profileText=d.profile.split('\n').filter(l=>l.trim()).join(' ');
 
   const exp=d.experience.map(e=>{
-    const dateStr=`${fmtD(e.start)} – ${e.current?tr.present:fmtD(e.end)}`;
+    const dateStr=`${fmtD(e.start)} - ${e.current?tr.present:fmtD(e.end)}`;
     const parts=(e.company||'').split(/\s*·\s*/);
     const coName=parts[0]||'';
     const coLoc=parts.slice(1).join(' · ');
@@ -539,7 +543,7 @@ function renderCV(){
 
   const edu=d.education.map(e=>`
     <div class="cv-edu-card">
-      <div class="cv-edu-dt">${fmtD(e.start)} – ${fmtD(e.end)}</div>
+      <div class="cv-edu-dt">${fmtD(e.start)} - ${fmtD(e.end)}</div>
       <div class="cv-edu-deg">${esc(e.degree)}</div>
       <div class="cv-edu-sch">${esc(e.school)}</div>
     </div>`).join('');
