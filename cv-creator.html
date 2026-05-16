@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CV Creator — Simon Reimer</title>
+<style>
+:root { --p:#00b4a0; --pd:#007a6e; --dark:#1e2a3a; --mid:#5a6a7a; --light:#8090a0; --border:#d8e3ec; --bg:#f4f7fa; --orange:#e8920a; --sidebar-w:238px; --fs-hdr:1; --fs-profile:1; --fs-left:1; --fs-right:1; --fs-skills:1; --fs-langs:1; --fs-certs:1; --fs-exp:1; --fs-edu:1; --spacing-r:1; --spacing-l:1; }
+/* COLOR EDITOR */
+.color-section{margin-bottom:18px;}
+.color-section-title{font-size:.68em;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border);}
+.color-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+.color-row label{font-size:.73em;color:var(--mid);flex:1;}
+.color-row input[type=color]{width:34px;height:28px;border:2px solid var(--border);border-radius:5px;cursor:pointer;padding:2px;background:white;}
+.color-row input[type=color]:hover{border-color:var(--p);}
+.color-hex{font-size:.68em;font-family:monospace;color:var(--mid);width:56px;text-align:right;}
+.theme-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:4px;}
+.theme-swatch{height:32px;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:all .2s;display:flex;align-items:center;justify-content:center;font-size:.6em;font-weight:700;color:white;text-shadow:0 1px 2px rgba(0,0,0,.4);}
+.theme-swatch:hover{transform:translateY(-2px);box-shadow:0 3px 8px rgba(0,0,0,.2);}
+.theme-swatch.active{border-color:white;box-shadow:0 0 0 3px var(--p);}
+.theme-swatch.se-swatch{background:linear-gradient(135deg,#1d1741 50%,#6929c4 100%);}
+.lang-color-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.reset-btn{width:100%;padding:7px;background:#fee2e2;color:#ef4444;border:1px solid #fecaca;border-radius:5px;cursor:pointer;font-size:.78em;font-weight:700;margin-top:4px;}
+.reset-btn:hover{background:#fecaca;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#1a2332;color:var(--dark);height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+
+/* TOOLBAR */
+#tb{background:#0f1923;padding:10px 18px;display:flex;align-items:center;gap:10px;border-bottom:2px solid var(--p);flex-shrink:0;}
+.brand{color:var(--p);font-weight:700;font-size:1.05em;margin-right:8px;}
+.lgrp{display:flex;gap:3px;background:#1a2332;padding:3px;border-radius:7px;}
+.lbtn{background:transparent;color:#8899aa;border:none;padding:5px 13px;border-radius:5px;cursor:pointer;font-size:.82em;font-weight:700;transition:all .2s;}
+.lbtn:hover{background:#263548;color:white;}
+.lbtn.active{background:var(--p);color:white;}
+.tsep{flex:1;}
+.tbtn{background:#263548;color:white;border:none;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:.82em;font-weight:500;transition:all .2s;white-space:nowrap;}
+.tbtn:hover{background:#344a60;}
+.tbtn.pri{background:var(--p);}
+.tbtn.pri:hover{background:var(--pd);}
+
+/* LAYOUT */
+#main{display:flex;flex:1;overflow:hidden;position:relative;}
+
+/* EDITOR */
+#ep{width:370px;background:var(--bg);display:flex;flex-direction:column;border-right:1px solid var(--border);flex-shrink:0;transition:width .3s;}
+#ep.collapsed{width:0;overflow:hidden;}
+.etabs{display:flex;flex-wrap:wrap;gap:2px;padding:7px;background:#e6edf4;border-bottom:1px solid var(--border);flex-shrink:0;}
+.etab{background:transparent;border:none;padding:5px 9px;border-radius:4px;cursor:pointer;font-size:.72em;font-weight:700;color:#5a6a7a;transition:all .2s;white-space:nowrap;}
+.etab:hover{background:#d0dce8;}
+.etab.active{background:var(--p);color:white;}
+.econtent{flex:1;overflow-y:auto;padding:14px;}
+.esec{display:none;}
+.esec.active{display:block;}
+.fg{margin-bottom:12px;}
+.fg label{display:block;font-size:.7em;font-weight:700;color:#5a6a7a;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
+.fg input,.fg textarea{width:100%;padding:7px 9px;border:1px solid var(--border);border-radius:5px;font-size:.85em;background:white;color:var(--dark);transition:border .2s;font-family:inherit;}
+.fg input:focus,.fg textarea:focus{outline:none;border-color:var(--p);}
+.fg textarea{resize:vertical;min-height:70px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.sdiv{font-size:.68em;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:1px;margin:14px 0 8px;border-bottom:1px solid var(--border);padding-bottom:3px;}
+.photo-area{width:90px;height:90px;border-radius:50%;border:3px dashed var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;margin:6px auto 14px;background:#e6edf4;transition:all .2s;}
+.photo-area:hover{border-color:var(--p);}
+.photo-area img{width:100%;height:100%;object-fit:cover;}
+.ph-txt{font-size:.65em;color:#8899aa;text-align:center;padding:8px;}
+.tags-wrap{display:flex;flex-wrap:wrap;gap:5px;padding:7px;border:1px solid var(--border);border-radius:5px;background:white;min-height:38px;align-items:center;}
+.tag{background:var(--p);color:white;padding:3px 7px;border-radius:3px;font-size:.72em;display:flex;align-items:center;gap:3px;}
+.tx{cursor:pointer;opacity:.8;line-height:1;}
+.tx:hover{opacity:1;}
+.tinput{border:none;outline:none;font-size:.78em;min-width:70px;flex:1;font-family:inherit;}
+.card{background:white;border:1px solid var(--border);border-radius:7px;padding:11px;margin-bottom:9px;}
+.card-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.card-ttl{font-size:.78em;font-weight:700;color:var(--dark);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:250px;}
+.delbtn{background:#fee2e2;color:#ef4444;border:none;width:22px;height:22px;border-radius:4px;cursor:pointer;font-size:.85em;flex-shrink:0;}
+.addbtn{width:100%;padding:7px;background:#e0f7f5;color:var(--p);border:2px dashed var(--p);border-radius:5px;cursor:pointer;font-size:.78em;font-weight:700;margin-top:4px;}
+.addbtn:hover{background:#c5f0eb;}
+.chk-row{display:flex;align-items:center;gap:6px;font-size:.75em;margin:5px 0 9px;cursor:pointer;}
+#etoggle{position:absolute;left:370px;top:50%;transform:translateY(-50%);background:var(--p);color:white;border:none;width:18px;height:36px;cursor:pointer;border-radius:0 4px 4px 0;font-size:.8em;z-index:20;transition:left .3s;}
+#ep.collapsed~#etoggle{left:0;}
+
+/* PREVIEW */
+#pp{flex:1;overflow:auto;background:#2a3a4a;display:flex;align-items:flex-start;justify-content:center;padding:20px;}
+
+/* ══ CV ══════════════════════════════════════════════════════════════════ */
+.cv-wrap{background:white;width:794px;height:1123px;overflow:hidden;box-shadow:0 10px 50px rgba(0,0,0,.5);display:flex;flex-direction:column;flex-shrink:0;}
+#cv-outer{position:relative;flex-shrink:0;}
+#cv-frame{position:absolute;top:0;left:0;transform-origin:top left;}
+
+/* Header */
+.cv-hdr{display:flex;align-items:center;padding:26px 30px 22px;gap:20px;border-bottom:1px solid #e8edf4;font-size:calc(16px * var(--fs-hdr));}
+.cv-photo{width:90px;height:90px;border-radius:50%;border:3px solid var(--p);object-fit:cover;flex-shrink:0;}
+.cv-photo-ph{width:90px;height:90px;border-radius:50%;border:3px solid var(--p);background:#e8edf4;display:flex;align-items:center;justify-content:center;font-size:2em;flex-shrink:0;}
+.cv-hdr-mid{flex:1;padding-left:6px;}
+.cv-hdr-name{font-size:1.95em;font-weight:700;color:var(--dark);line-height:1.15;}
+.cv-hdr-title{font-size:.64em;font-weight:700;color:var(--p);letter-spacing:4px;text-transform:uppercase;margin-top:5px;}
+.cv-hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;}
+.cv-ci{display:flex;align-items:center;gap:6px;font-size:.7em;color:var(--mid);}
+.cv-ci i{font-style:normal;}
+.cv-link{color:inherit;text-decoration:none;}
+.cv-link:hover{text-decoration:underline;opacity:.85;}
+
+/* About Me bar */
+.cv-about{padding:13px 26px;display:flex;align-items:flex-start;gap:12px;flex-shrink:0;}
+.cv-about-qt{font-size:2.2em;color:rgba(255,255,255,.28);font-family:Georgia,serif;line-height:1;flex-shrink:0;margin-top:-2px;font-style:normal;}
+.cv-about-body{flex:1;min-width:0;}
+.cv-about-lbl{font-size:calc(.48em * var(--fs-profile));font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:3px;}
+.cv-about-txt{font-size:calc(.77em * var(--fs-profile));color:rgba(255,255,255,.92);font-style:italic;line-height:1.6;}
+
+/* Body */
+.cv-body{display:flex;flex:1;overflow:hidden;}
+
+/* Left */
+.cv-left{width:var(--sidebar-w);flex-shrink:0;padding:20px 18px 20px 22px;border-right:1px solid #e8edf4;font-size:calc(16px * var(--fs-left));overflow:hidden;}
+.cv-sh{font-size:.59em;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--p);margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid var(--p);}
+.cv-mod+.cv-mod{margin-top:calc(16px * var(--spacing-l));}
+.cv-skgrp{margin-bottom:11px;}
+.cv-skgrp-lbl{font-size:.57em;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--light);margin-bottom:4px;}
+.cv-skgrp-tags{font-size:.71em;color:#3a5068;line-height:1.9;}
+.cv-lang-item{margin-bottom:9px;}
+.cv-lang-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;}
+.cv-lang-name{font-size:.74em;color:var(--dark);}
+.cv-lang-lvl{font-size:.57em;font-weight:700;letter-spacing:1px;color:var(--p);text-transform:uppercase;}
+.cv-lang-bar{height:3px;background:#e0e8f0;border-radius:2px;}
+.cv-lang-fill{height:100%;border-radius:2px;}
+.cv-cert-card{background:#f4f7fa;border-radius:6px;padding:9px 11px;margin-bottom:7px;border-left:3px solid var(--orange);}
+.cv-cert-ttl{font-size:.7em;font-weight:600;color:var(--dark);line-height:1.35;}
+.cv-cert-iss{font-size:.61em;color:var(--light);line-height:1.35;margin-top:1px;}
+.cv-cert-dt{font-size:.62em;font-weight:700;color:var(--orange);margin-top:3px;}
+
+/* Right */
+.cv-right{flex:1;padding:20px 26px;font-size:calc(16px * var(--fs-right));overflow:hidden;}
+.cv-msh{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.cv-msh-icon{font-size:.85em;color:var(--orange);flex-shrink:0;}
+.cv-msh-title{font-size:.62em;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--dark);flex:1;padding-bottom:7px;border-bottom:1px solid #e0e8f0;}
+.cv-exp-entry{display:flex;margin-bottom:calc(14px * var(--spacing-r));}
+.cv-exp-bar{width:4px;border-radius:2px;flex-shrink:0;margin-right:13px;}
+.cv-exp-bar.cur{background:var(--orange);}
+.cv-exp-bar.past{background:var(--p);}
+.cv-exp-ct{flex:1;min-width:0;}
+.cv-exp-dt{font-size:.57em;font-weight:700;color:var(--p);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;}
+.cv-exp-dt.cur{color:var(--orange);}
+.cv-exp-hdr{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 4px;margin-bottom:3px;}
+.cv-exp-title{font-size:.84em;font-weight:700;color:var(--dark);}
+.cv-exp-sep{font-size:.69em;color:var(--light);margin:0 1px;}
+.cv-exp-co-name{font-size:.69em;color:var(--p);font-weight:600;}
+.cv-exp-co-loc{font-size:.69em;color:var(--light);}
+.cv-bul{display:flex;align-items:flex-start;gap:5px;font-size:.7em;color:#3a5068;margin-bottom:2px;line-height:1.5;}
+.cv-bul-arr{color:var(--p);flex-shrink:0;}
+.cv-edu-card{background:#f4f7fa;border-radius:6px;padding:10px 14px;margin-bottom:7px;border-left:3px solid var(--p);}
+.cv-edu-dt{font-size:.58em;font-weight:700;color:var(--p);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;}
+.cv-edu-deg{font-size:.79em;font-weight:700;color:var(--dark);line-height:1.3;}
+.cv-edu-sch{font-size:.69em;color:var(--p);margin-top:2px;}
+
+/* IMPORT MODAL */
+#itmodal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2000;align-items:center;justify-content:center;}
+#itmodal.open{display:flex;}
+.itbox{background:white;border-radius:12px;width:660px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.4);overflow:hidden;}
+.ithdr{padding:18px 22px 14px;border-bottom:1px solid var(--border);}
+.ithdr h3{font-size:1em;color:var(--dark);margin-bottom:4px;}
+.ithdr p{font-size:.78em;color:var(--mid);}
+.itbody{flex:1;overflow-y:auto;padding:16px 22px;display:flex;flex-direction:column;gap:12px;}
+#it-ta{width:100%;height:260px;padding:10px;border:1px solid var(--border);border-radius:7px;font-size:.8em;font-family:monospace;resize:vertical;color:var(--dark);}
+#it-ta:focus{outline:none;border-color:var(--p);}
+#it-pv{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:12px;font-size:.75em;display:none;}
+#it-pv h4{color:var(--p);margin-bottom:8px;}
+.prv-ok{color:#16a34a;margin-bottom:3px;}
+.prv-warn{color:#d97706;margin-bottom:3px;}
+.itftr{padding:12px 22px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;align-items:center;}
+.itftr .hint{flex:1;font-size:.72em;color:var(--mid);}
+.it-cancel{background:var(--bg);color:var(--mid);border:1px solid var(--border);padding:8px 16px;border-radius:6px;cursor:pointer;font-size:.85em;}
+.it-parse{background:#e0f7f5;color:var(--pd);border:1px solid var(--p);padding:8px 16px;border-radius:6px;cursor:pointer;font-size:.85em;font-weight:600;}
+.it-apply{background:var(--p);color:white;border:none;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:.85em;font-weight:600;display:none;}
+.it-apply:hover{background:var(--pd);}
+
+/* TOAST */
+#toast{position:fixed;bottom:20px;right:20px;background:#1d1741;color:white;padding:9px 16px;border-radius:7px;font-size:.82em;font-weight:600;z-index:9999;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;}
+#toast.show{opacity:1;transform:translateY(0);}
+
+/* LAYOUT TAB */
+.slider-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.slider-row label{font-size:.72em;color:var(--mid);width:118px;flex-shrink:0;}
+.slider-row input[type=range]{flex:1;cursor:pointer;accent-color:var(--p);}
+.slider-val{font-size:.72em;font-family:monospace;color:var(--dark);width:46px;text-align:right;flex-shrink:0;}
+
+/* PRINT */
+@media print{
+  body{background:white !important;overflow:visible !important;height:auto !important;}
+  #tb,#ep,#etoggle,#itmodal{display:none !important;}
+  #main{height:auto !important;overflow:visible !important;}
+  #pp{background:white !important;padding:0 !important;height:auto !important;overflow:visible !important;display:block !important;}
+  #cv-outer{position:static !important;width:auto !important;height:auto !important;}
+  #cv-frame{position:static !important;transform:none !important;width:auto !important;height:auto !important;}
+  .cv-wrap{width:100% !important;height:auto !important;overflow:visible !important;box-shadow:none !important;}
+  @page{size:A4;margin:0;}
+}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:#e6edf4;}
+::-webkit-scrollbar-thumb{background:#b0bfc8;border-radius:3px;}
+</style>
+</head>
+<body>
+
+<div id="tb">
+  <span class="brand">◈ CV Creator</span>
+  <div class="lgrp">
+    <button class="lbtn active" data-lang="en" onclick="setLang('en')">EN</button>
+    <button class="lbtn" data-lang="de" onclick="setLang('de')">DE</button>
+    <button class="lbtn" data-lang="es" onclick="setLang('es')">ES</button>
+    <button class="lbtn" data-lang="fr" onclick="setLang('fr')">FR</button>
+  </div>
+  <div class="tsep"></div>
+  <input type="file" id="jsonIn" accept=".json" style="display:none" onchange="importJSON(event)">
+  <button class="tbtn" onclick="saveData()" title="Save to browser (persists across sessions)">💾 Save</button>
+  <button class="tbtn" onclick="openIT()">📋 Import Text</button>
+  <button class="tbtn" onclick="document.getElementById('jsonIn').click()">↑ Import JSON</button>
+  <button class="tbtn" onclick="exportJSON()">↓ Export JSON</button>
+  <button class="tbtn pri" onclick="window.print()">📄 Create PDF</button>
+</div>
+
+<div id="main">
+  <div id="ep">
+    <div class="etabs">
+      <button class="etab active" data-tab="personal" onclick="switchTab('personal')">Personal</button>
+      <button class="etab" data-tab="skills" onclick="switchTab('skills')">Skills</button>
+      <button class="etab" data-tab="languages" onclick="switchTab('languages')">Languages</button>
+      <button class="etab" data-tab="certificates" onclick="switchTab('certificates')">Certs</button>
+      <button class="etab" data-tab="profile" onclick="switchTab('profile')">Profile</button>
+      <button class="etab" data-tab="experience" onclick="switchTab('experience')">Experience</button>
+      <button class="etab" data-tab="education" onclick="switchTab('education')">Education</button>
+      <button class="etab" data-tab="colors" onclick="switchTab('colors')">🎨 Colors</button>
+      <button class="etab" data-tab="layout" onclick="switchTab('layout')">📐 Layout</button>
+    </div>
+    <div class="econtent" id="econtent"></div>
+  </div>
+  <button id="etoggle" onclick="toggleEditor()">‹</button>
+  <div id="pp">
+    <div id="cv-outer">
+      <div id="cv-frame">
+        <div class="cv-wrap" id="cv"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<div id="itmodal">
+  <div class="itbox">
+    <div class="ithdr">
+      <h3>📋 Import CV from Text</h3>
+      <p>Paste plain CV text (from PDF copy, Word, LinkedIn export). Parser extracts name, contact, experience, education and more.</p>
+    </div>
+    <div class="itbody">
+      <textarea id="it-ta" placeholder="Paste your CV text here…&#10;&#10;Simon Reimer&#10;Connectivity Engineer&#10;email@example.com&#10;&#10;EXPERIENCE&#10;Jul 2025 – Present&#10;Connectivity Engineer&#10;Siemens AG&#10;- Bullet 1"></textarea>
+      <div id="it-pv"></div>
+    </div>
+    <div class="itftr">
+      <span class="hint">💡 Parse first, review results, then Apply.</span>
+      <button class="it-cancel" onclick="closeIT()">Cancel</button>
+      <button class="it-parse" onclick="runParse()">🔍 Parse</button>
+      <button class="it-apply" id="it-apply-btn" onclick="applyParsed()">✓ Apply to CV</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+let D = {
+  personal:{
+    name:"Simon Reimer",
+    title:"Connectivity Engineer · Building Automation",
+    location:"Freiburg ↔ Renens, CH",
+    email:"sreimer94@gmail.com",
+    phone:"+41 79 785 52 65",
+    base:"Freiburg / Renens · CH",
+    linkedin:"simon-reimer-08676a169",
+    github:"sreimer94",
+    photo:"1758657829217.jpg"
+  },
+  skills:{
+    technical:["BACnet","Python","Modbus","Modbus TCP","KNX","M-Bus"],
+    tools:["VS Code","MSIB"],
+    domain:["Building Automation","Energy Monitoring"],
+    soft:["Analytical","Innovative","Systems Thinker"]
+  },
+  languages:[
+    {name:"German",level:"Native"},
+    {name:"English",level:"C2"},
+    {name:"Spanish",level:"C1"},
+    {name:"French",level:"B1"}
+  ],
+  certificates:[
+    {title:"PM@SI — Basic",issuer:"Siemens Schweiz AG",date:"2025"},
+    {title:"KNX Basic Course",issuer:"KNX Training Centre, Chamber of Crafts OWL Bielefeld",date:"Apr 10, 2018"},
+    {title:"Programming for Everybody — Python",issuer:"University of Michigan (Coursera)",date:"Jan 27, 2021"}
+  ],
+  profile:"Connectivity Engineer with deep field experience and a software mindset.\n\nI bridge the gap between building automation hardware and digital services — designing energy-monitoring solutions, integrating BACnet, Modbus and KNX protocols, and building the internal tools my team needs to ship faster.",
+  experience:[
+    {id:1,start:"Jul 2025",end:"",current:true,title:"Connectivity Engineer",subtitle:"Current",
+     company:"Siemens Schweiz AG · Renens, Vaud, Switzerland",
+     bullets:["Project Lead for Energy Monitoring (Solution Engineer)",
+              "Tool development — EDE Manager, ModbusTCP Creator, ebiX Reader",
+              "SPM onboarding — Desigo Uptime, Uptime Essential, Digital Monitoring Assistance",
+              "MSIB onboarding — BACnet, Modbus, Modbus TCP and adjacent protocols"]},
+    {id:2,start:"Feb 2024",end:"Jun 2025",current:false,title:"Remote Integration Specialist",subtitle:"",
+     company:"Siemens AG · Frankfurt am Main, Hesse, Germany",
+     bullets:["Remote commissioning and integration of building automation gateways",
+              "Protocol troubleshooting across BACnet, Modbus and KNX deployments",
+              "Customer-facing escalation engineering for connectivity issues"]},
+    {id:3,start:"Jun 2021",end:"Sep 2023",current:false,title:"Lead Service Technician — Fire Alarm Systems",subtitle:"",
+     company:"Siemens AG · Bielefeld, North Rhine-Westphalia, Germany",
+     bullets:["Sinteso fire extinguishing systems — service and commissioning",
+              "Sigmasys configuration and on-site support",
+              "Mentoring junior technicians on field procedures"]},
+    {id:4,start:"Feb 2021",end:"May 2021",current:false,title:"Service Technician — Fire Alarm Systems",subtitle:"",
+     company:"Siemens AG · Freiburg im Breisgau, Baden-Württemberg, Germany",
+     bullets:["Maintenance of fire alarm systems across commercial sites",
+              "Inspection reports and compliance documentation"]},
+    {id:5,start:"Oct 2019",end:"Jan 2021",current:false,title:"Commissioning Engineer — Fire Alarm Systems",subtitle:"",
+     company:"Siemens AG · Freiburg im Breisgau, Baden-Württemberg, Germany",
+     bullets:["Commissioning of fire alarm systems in new-build projects",
+              "Acceptance testing alongside building owners and certifiers"]},
+    {id:6,start:"Nov 2018",end:"Sep 2019",current:false,title:"Master Electrician",subtitle:"",
+     company:"Leclanché · Willstätt, Baden-Württemberg, Germany",
+     bullets:["Process optimization on battery production lines",
+              "Development and integration work on production lines"]},
+    {id:7,start:"Jan 2017",end:"Mar 2017",current:false,title:"Electronics Technician — Building Services",subtitle:"",
+     company:"E-Technik Reimer · Preußisch Oldendorf, North Rhine-Westphalia, Germany",
+     bullets:["Installation and maintenance of residential electrical systems"]},
+    {id:8,start:"Dec 2014",end:"Dec 2015",current:false,title:"Mechatronics Technician",subtitle:"",
+     company:"Westfleisch eG · Lübbecke, North Rhine-Westphalia, Germany",
+     bullets:["Maintenance of mechanical and electrical plant equipment",
+              "Fault diagnosis on automated production lines"]}
+  ],
+  education:[
+    {id:1,start:"May 2017",end:"Jun 2018",degree:"Master Electrician — Electrical Engineering",
+     school:"Handwerkskammer Ostwestfalen-Lippe zu Bielefeld"},
+    {id:2,start:"Aug 2011",end:"Jul 2014",degree:"Vocational Training — Energy & Building Electronics",
+     school:"Berufskolleg Lübbecke"},
+    {id:3,start:"Aug 2007",end:"Jul 2011",degree:"Secondary School Diploma (Realschulabschluss)",
+     school:"Städtische Realschule Preußisch Oldendorf"}
+  ]
+};
+
+// ── TRANSLATIONS ──────────────────────────────────────────────────────────────
+const TR={
+  en:{skills:"SKILLS",languages:"LANGUAGES",certificates:"CERTIFICATES",
+      profile:"PROFILE",experience:"EXPERIENCE",education:"EDUCATION",
+      present:"PRESENT",native:"NATIVE",
+      technical:"TECHNICAL",tools:"TOOL",domain:"DOMAIN",soft:"SOFT",
+      email:"✉",phone:"☏",base:"⌖",ln:"in",gh:"⌥"},
+  de:{skills:"FÄHIGKEITEN",languages:"SPRACHEN",certificates:"ZERTIFIKATE",
+      profile:"PROFIL",experience:"BERUFSERFAHRUNG",education:"AUSBILDUNG",
+      present:"HEUTE",native:"MUTTERSPRACHE",
+      technical:"TECHNICAL",tools:"TOOL",domain:"DOMAIN",soft:"SOFT",
+      email:"✉",phone:"☏",base:"⌖",ln:"in",gh:"⌥"},
+  es:{skills:"COMPETENCIAS",languages:"IDIOMAS",certificates:"CERTIFICADOS",
+      profile:"PERFIL",experience:"EXPERIENCIA",education:"EDUCACIÓN",
+      present:"PRESENTE",native:"NATIVO",
+      technical:"TÉCNICO",tools:"HERRAMIENTAS",domain:"DOMINIO",soft:"HABILIDADES",
+      email:"✉",phone:"☏",base:"⌖",ln:"in",gh:"⌥"},
+  fr:{skills:"COMPÉTENCES",languages:"LANGUES",certificates:"CERTIFICATIONS",
+      profile:"PROFIL",experience:"EXPÉRIENCE",education:"FORMATION",
+      present:"PRÉSENT",native:"LANGUE MATERNELLE",
+      technical:"TECHNIQUE",tools:"OUTILS",domain:"DOMAINE",soft:"SAVOIR-ÊTRE",
+      email:"✉",phone:"☏",base:"⌖",ln:"in",gh:"⌥"}
+};
+
+let lang='en', tab='personal', editorOpen=true, parsedData=null;
+let LAYOUT={sidebarWidth:238, fsHeader:100, fsProfile:100, fsLeft:100, fsRight:100, fsSkills:100, fsLangs:100, fsCerts:100, fsExp:100, fsEdu:100, spacingR:100, spacingL:100};
+
+function fitCV(){
+  const pp=document.getElementById('pp');
+  const frame=document.getElementById('cv-frame');
+  const outer=document.getElementById('cv-outer');
+  if(!pp||!frame||!outer||pp.clientWidth===0) return;
+  const avW=pp.clientWidth-40;
+  const scale=Math.min(avW/794,1);
+  frame.style.transform=`scale(${scale})`;
+  outer.style.width=Math.round(794*scale)+'px';
+  outer.style.height=Math.round(1123*scale)+'px';
+}
+window.addEventListener('resize',fitCV);
+
+function applyLayout(){
+  const r=document.documentElement.style;
+  r.setProperty('--sidebar-w',LAYOUT.sidebarWidth+'px');
+  r.setProperty('--fs-hdr',LAYOUT.fsHeader/100);
+  r.setProperty('--fs-profile',LAYOUT.fsProfile/100);
+  r.setProperty('--fs-left',LAYOUT.fsLeft/100);
+  r.setProperty('--fs-right',LAYOUT.fsRight/100);
+  r.setProperty('--fs-skills',LAYOUT.fsSkills/100);
+  r.setProperty('--fs-langs',LAYOUT.fsLangs/100);
+  r.setProperty('--fs-certs',LAYOUT.fsCerts/100);
+  r.setProperty('--fs-exp',LAYOUT.fsExp/100);
+  r.setProperty('--fs-edu',LAYOUT.fsEdu/100);
+  r.setProperty('--spacing-r',LAYOUT.spacingR/100);
+  r.setProperty('--spacing-l',LAYOUT.spacingL/100);
+  renderCV();
+  fitCV();
+}
+// ── THEME SYSTEM ──────────────────────────────────────────────────────────────
+const THEMES={
+  se:     {name:'SE',     primary:'#6929c4',accent:'#a352cc',dark:'#1d1741',mid:'#4a3870',light:'#8870a8',bg:'#f4f1f9',border:'#d0c8e8',card:'#ebe6f5',langs:['#1d1741','#6929c4','#a352cc','#c8aaf0']},
+  teal:   {name:'Teal',   primary:'#00b4a0',accent:'#e8920a',dark:'#1e2a3a',mid:'#5a6a7a',light:'#8090a0',bg:'#f4f7fa',border:'#d8e3ec',card:'#f0f8f7',langs:['#1e2a3a','#00b4a0','#48a090','#8aa0b0']},
+  navy:   {name:'Navy',   primary:'#1a5f9e',accent:'#e8920a',dark:'#0d2340',mid:'#4a6080',light:'#7090a8',bg:'#f0f4f8',border:'#c8d8e8',card:'#eaf2f8',langs:['#0d2340','#1a5f9e','#2a80c0','#7aa0c0']},
+  forest: {name:'Forest', primary:'#2d7a4a',accent:'#b07820',dark:'#1a3020',mid:'#4a6050',light:'#7a9080',bg:'#f0f5f0',border:'#c0d8c0',card:'#eaf4ec',langs:['#1a3020','#2d7a4a','#40a060','#80b090']},
+  wine:   {name:'Wine',   primary:'#8b2252',accent:'#d4702a',dark:'#2d0a18',mid:'#6a3a50',light:'#9a6a80',bg:'#f8f0f4',border:'#e0c8d0',card:'#f8eaf0',langs:['#2d0a18','#8b2252','#b03870','#c08090']},
+  slate:  {name:'Slate',  primary:'#4a6a8a',accent:'#c08030',dark:'#1a2830',mid:'#4a5a68',light:'#7a8898',bg:'#f2f4f6',border:'#c8d0da',card:'#edf0f4',langs:['#1a2830','#4a6a8a','#6a90a8','#9ab0c0']}
+};
+
+let COLORS={...THEMES.se};
+
+function darken(hex,amt=30){
+  const r=Math.max(0,parseInt(hex.slice(1,3),16)-amt);
+  const g=Math.max(0,parseInt(hex.slice(3,5),16)-amt);
+  const b=Math.max(0,parseInt(hex.slice(5,7),16)-amt);
+  return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+function applyColors(){
+  const r=document.documentElement.style;
+  r.setProperty('--p',COLORS.primary);
+  r.setProperty('--pd',darken(COLORS.primary));
+  r.setProperty('--dark',COLORS.dark);
+  r.setProperty('--mid',COLORS.mid);
+  r.setProperty('--light',COLORS.light);
+  r.setProperty('--orange',COLORS.accent);
+  r.setProperty('--bg',COLORS.bg);
+  r.setProperty('--border',COLORS.border);
+  renderCV();
+}
+function setColor(key,val){
+  COLORS[key]=val;
+  applyColors();
+  // refresh hex labels without full re-render
+  const hex=document.getElementById('hex-'+key);
+  if(hex) hex.textContent=val;
+}
+function setLangColor(i,val){
+  COLORS.langs[i]=val;
+  applyColors();
+  const hex=document.getElementById('hex-lang'+i);
+  if(hex) hex.textContent=val;
+}
+function applyTheme(name){
+  COLORS={...THEMES[name]};
+  applyColors();
+  if(tab==='colors') renderEditor();
+}
+
+const LANG_COLORS=COLORS.langs; // kept for reference; renderCV uses COLORS.langs directly
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function lvlPct(l){return({'Native':100,'C2':95,'C1':80,'B2':70,'B1':55,'A2':35,'A1':20})[l]||50;}
+function fmtD(s){
+  if(!s) return '';
+  return s.replace(/^(\w{3})\s+(\d{4})$/,(_,m,y)=>m.toUpperCase()+'.'+y);
+}
+
+// ── RENDER CV ─────────────────────────────────────────────────────────────────
+function renderCV(){
+  const d=D, tr=TR[lang];
+
+  const photo=d.personal.photo
+    ?`<img class="cv-photo" src="${esc(d.personal.photo)}" alt="" onerror="this.style.display='none';this.nextSibling.style.display='flex'">`:'';
+  const photoPh=`<div class="cv-photo-ph" ${d.personal.photo?'style="display:none"':''}>👤</div>`;
+
+  const ci=(icon,val,href)=>val?`<div class="cv-ci"><i>${icon}</i>${href?`<a href="${href}" target="_blank" rel="noopener" class="cv-link">${esc(val)}</a>`:esc(val)}</div>`:'';
+  const teamsHref=d.personal.phone?`https://teams.microsoft.com/l/call/0/0?users=${encodeURIComponent(d.personal.phone)}`:'';
+  const contact=[
+    ci(tr.email, d.personal.email, d.personal.email?`mailto:${d.personal.email}`:''),
+    ci(tr.phone, d.personal.phone, teamsHref),
+    ci(tr.base,  d.personal.base,  ''),
+    ci(tr.ln,    d.personal.linkedin, d.personal.linkedin?`https://www.linkedin.com/in/${d.personal.linkedin}/`:''),
+    ci(tr.gh,    d.personal.github,   d.personal.github?`https://github.com/${d.personal.github}`:'')
+  ].join('');
+
+  const skillGroups=[
+    {lbl:tr.technical,items:d.skills.technical},
+    {lbl:tr.tools,items:d.skills.tools},
+    {lbl:tr.domain,items:d.skills.domain},
+    {lbl:tr.soft,items:d.skills.soft}
+  ].filter(g=>g.items&&g.items.length).map(g=>`
+    <div class="cv-skgrp">
+      <div class="cv-skgrp-lbl">${g.lbl}</div>
+      <div class="cv-skgrp-tags">${g.items.map(s=>esc(s)).join(' · ')}</div>
+    </div>`).join('');
+
+  const langs=d.languages.map((l,i)=>`
+    <div class="cv-lang-item">
+      <div class="cv-lang-row">
+        <span class="cv-lang-name">${esc(l.name)}</span>
+        <span class="cv-lang-lvl">${l.level==='Native'?tr.native:esc(l.level)}</span>
+      </div>
+      <div class="cv-lang-bar">
+        <div class="cv-lang-fill" style="width:${lvlPct(l.level)}%;background:${(COLORS.langs||LANG_COLORS)[i%(COLORS.langs||LANG_COLORS).length]}"></div>
+      </div>
+    </div>`).join('');
+
+  const certs=d.certificates.map(c=>`
+    <div class="cv-cert-card">
+      <div class="cv-cert-ttl">${esc(c.title)}</div>
+      <div class="cv-cert-iss">${esc(c.issuer)}</div>
+      <div class="cv-cert-dt">${esc(c.date)}</div>
+    </div>`).join('');
+
+  const profileText=d.profile.split('\n').filter(l=>l.trim()).join(' ');
+
+  const exp=d.experience.map(e=>{
+    const dateStr=`${fmtD(e.start)} – ${e.current?tr.present:fmtD(e.end)}`;
+    const parts=(e.company||'').split(/\s*·\s*/);
+    const coName=parts[0]||'';
+    const coLoc=parts.slice(1).join(' · ');
+    return `
+    <div class="cv-exp-entry">
+      <div class="cv-exp-bar ${e.current?'cur':'past'}"></div>
+      <div class="cv-exp-ct">
+        <div class="cv-exp-dt ${e.current?'cur':''}">${dateStr}</div>
+        <div class="cv-exp-hdr">
+          <span class="cv-exp-title">${esc(e.title)}</span>
+          ${coName?`<span class="cv-exp-sep">·</span><span class="cv-exp-co-name">${esc(coName.trim())}</span>`:''}
+          ${coLoc?`<span class="cv-exp-sep">·</span><span class="cv-exp-co-loc">${esc(coLoc.trim())}</span>`:''}
+        </div>
+        ${(e.bullets||[]).map(b=>`
+        <div class="cv-bul"><span class="cv-bul-arr">›</span><span>${esc(b)}</span></div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+
+  const edu=d.education.map(e=>`
+    <div class="cv-edu-card">
+      <div class="cv-edu-dt">${fmtD(e.start)} – ${fmtD(e.end)}</div>
+      <div class="cv-edu-deg">${esc(e.degree)}</div>
+      <div class="cv-edu-sch">${esc(e.school)}</div>
+    </div>`).join('');
+
+  document.getElementById('cv').innerHTML=`
+    <div class="cv-hdr">
+      ${photo}${photoPh}
+      <div class="cv-hdr-mid">
+        <div class="cv-hdr-name">${esc(d.personal.name)}</div>
+        <div class="cv-hdr-title">${esc(d.personal.title)}</div>
+      </div>
+      <div class="cv-hdr-right">${contact}</div>
+    </div>
+    <div class="cv-about" style="background:linear-gradient(135deg,${COLORS.dark} 0%,${COLORS.primary} 100%)">
+      <div class="cv-about-qt">❝</div>
+      <div class="cv-about-body">
+        <div class="cv-about-lbl">${tr.profile}</div>
+        <div class="cv-about-txt">${esc(profileText)}</div>
+      </div>
+    </div>
+    <div class="cv-body">
+      <div class="cv-left">
+        <div class="cv-mod" style="font-size:calc(1em*var(--fs-skills))">
+          <div class="cv-sh">${tr.skills}</div>
+          ${skillGroups}
+        </div>
+        <div class="cv-mod" style="font-size:calc(1em*var(--fs-langs))">
+          <div class="cv-sh">${tr.languages}</div>
+          ${langs}
+        </div>
+        <div class="cv-mod" style="font-size:calc(1em*var(--fs-certs))">
+          <div class="cv-sh">${tr.certificates}</div>
+          ${certs}
+        </div>
+      </div>
+      <div class="cv-right">
+        <div class="cv-mod" style="font-size:calc(1em*var(--fs-exp))">
+          <div class="cv-msh">
+            <span class="cv-msh-icon">▶</span>
+            <span class="cv-msh-title">${tr.experience}</span>
+          </div>
+          ${exp}
+        </div>
+        <div class="cv-mod" style="font-size:calc(1em*var(--fs-edu));margin-top:calc(14px*var(--spacing-r))">
+          <div class="cv-msh">
+            <span class="cv-msh-icon">▲</span>
+            <span class="cv-msh-title">${tr.education}</span>
+          </div>
+          ${edu}
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── EDITOR HTML ───────────────────────────────────────────────────────────────
+function renderEditor(){
+  const c=document.getElementById('econtent');
+  c.innerHTML='';
+  const div=document.createElement('div');
+  div.className='esec active';
+  div.innerHTML=EH[tab]();
+  c.appendChild(div);
+}
+
+const EH={
+  personal(){
+    const p=D.personal;
+    return `
+      <div class="photo-area" onclick="document.getElementById('phIn').click()">
+        ${p.photo?`<img src="${esc(p.photo)}" onerror="this.style.display='none';this.nextSibling.style.display='block'"><span class="ph-txt" style="display:none">📷 Click</span>`:'<span class="ph-txt">📷<br>Click to add</span>'}
+      </div>
+      <input type="file" id="phIn" accept="image/*" style="display:none" onchange="uploadPhoto(event)">
+      <div class="fg"><label>Full Name</label><input value="${esc(p.name)}" oninput="D.personal.name=this.value;renderCV()"></div>
+      <div class="fg"><label>Job Title</label><input value="${esc(p.title)}" oninput="D.personal.title=this.value;renderCV()"></div>
+      <div class="fg"><label>Location (header display)</label><input value="${esc(p.location)}" oninput="D.personal.location=this.value;renderCV()"></div>
+      <div class="sdiv">Contact</div>
+      <div class="fg"><label>Email</label><input type="email" value="${esc(p.email)}" oninput="D.personal.email=this.value;renderCV()"></div>
+      <div class="fg"><label>Phone</label><input type="tel" value="${esc(p.phone)}" oninput="D.personal.phone=this.value;renderCV()"></div>
+      <div class="fg"><label>Base Location</label><input value="${esc(p.base)}" oninput="D.personal.base=this.value;renderCV()"></div>
+      <div class="fg"><label>LinkedIn (username)</label><input value="${esc(p.linkedin)}" oninput="D.personal.linkedin=this.value;renderCV()"></div>
+      <div class="fg"><label>GitHub (username)</label><input value="${esc(p.github)}" oninput="D.personal.github=this.value;renderCV()"></div>`;
+  },
+  skills(){
+    return ['technical','tools','domain','soft'].map(k=>`
+      <div class="fg">
+        <label>${k.charAt(0).toUpperCase()+k.slice(1)} Skills</label>
+        <div class="tags-wrap">
+          ${D.skills[k].map(v=>`<span class="tag">${esc(v)}<span class="tx" onclick="rmSkill('${k}','${esc(v)}')">×</span></span>`).join('')}
+          <input class="tinput" placeholder="Type + Enter…" onkeydown="addSkill(event,'${k}')">
+        </div>
+      </div>`).join('');
+  },
+  languages(){
+    return `<div>${D.languages.map((l,i)=>`
+      <div class="card">
+        <div class="card-hdr"><span class="card-ttl">${esc(l.name)}</span><button class="delbtn" onclick="D.languages.splice(${i},1);renderEditor();renderCV()">×</button></div>
+        <div class="g2">
+          <div class="fg" style="margin:0"><label>Language</label><input value="${esc(l.name)}" oninput="D.languages[${i}].name=this.value;renderCV()"></div>
+          <div class="fg" style="margin:0"><label>Level</label><input value="${esc(l.level)}" placeholder="C2 / Native" oninput="D.languages[${i}].level=this.value;renderCV()"></div>
+        </div>
+      </div>`).join('')}</div>
+      <button class="addbtn" onclick="D.languages.push({name:'New Language',level:'B1'});renderEditor();renderCV()">+ Add Language</button>`;
+  },
+  certificates(){
+    return `<div>${D.certificates.map((c,i)=>`
+      <div class="card">
+        <div class="card-hdr"><span class="card-ttl">${esc(c.title)}</span><button class="delbtn" onclick="D.certificates.splice(${i},1);renderEditor();renderCV()">×</button></div>
+        <div class="fg"><label>Title</label><input value="${esc(c.title)}" oninput="D.certificates[${i}].title=this.value;renderCV()"></div>
+        <div class="fg"><label>Issuer</label><input value="${esc(c.issuer)}" oninput="D.certificates[${i}].issuer=this.value;renderCV()"></div>
+        <div class="fg"><label>Date</label><input value="${esc(c.date)}" oninput="D.certificates[${i}].date=this.value;renderCV()"></div>
+      </div>`).join('')}</div>
+      <button class="addbtn" onclick="D.certificates.push({title:'New Certificate',issuer:'Issuer',date:'2025'});renderEditor();renderCV()">+ Add Certificate</button>`;
+  },
+  profile(){
+    return `<div class="fg"><label>Profile / Summary</label><textarea style="min-height:180px" oninput="D.profile=this.value;renderCV()">${esc(D.profile)}</textarea></div>`;
+  },
+  experience(){
+    return `<div>${D.experience.map((e,i)=>`
+      <div class="card">
+        <div class="card-hdr"><span class="card-ttl">${esc(e.title||'Position '+(i+1))}</span><button class="delbtn" onclick="D.experience.splice(${i},1);renderEditor();renderCV()">×</button></div>
+        <div class="g2">
+          <div class="fg" style="margin:0"><label>Start</label><input value="${esc(e.start)}" placeholder="Jul 2025" oninput="D.experience[${i}].start=this.value;renderCV()"></div>
+          <div class="fg" style="margin:0"><label>End</label><input value="${esc(e.end)}" placeholder="Jun 2026" oninput="D.experience[${i}].end=this.value;renderCV()"></div>
+        </div>
+        <label class="chk-row"><input type="checkbox" ${e.current?'checked':''} onchange="D.experience[${i}].current=this.checked;renderCV()"> Current position</label>
+        <div class="fg"><label>Job Title</label><input value="${esc(e.title)}" oninput="D.experience[${i}].title=this.value;renderCV()"></div>
+        <div class="fg"><label>Company · Location</label><input value="${esc(e.company)}" oninput="D.experience[${i}].company=this.value;renderCV()"></div>
+        <div class="fg"><label>Bullet Points (one per line)</label><textarea oninput="D.experience[${i}].bullets=this.value.split('\\n').filter(l=>l.trim()!='');renderCV()">${esc((e.bullets||[]).join('\n'))}</textarea></div>
+      </div>`).join('')}</div>
+      <button class="addbtn" onclick="D.experience.unshift({id:Date.now(),start:'',end:'',current:false,title:'New Position',subtitle:'',company:'',bullets:[]});renderEditor();renderCV()">+ Add Position</button>`;
+  },
+  education(){
+    return `<div>${D.education.map((e,i)=>`
+      <div class="card">
+        <div class="card-hdr"><span class="card-ttl">${esc(e.degree||'Education '+(i+1))}</span><button class="delbtn" onclick="D.education.splice(${i},1);renderEditor();renderCV()">×</button></div>
+        <div class="g2">
+          <div class="fg" style="margin:0"><label>Start</label><input value="${esc(e.start)}" oninput="D.education[${i}].start=this.value;renderCV()"></div>
+          <div class="fg" style="margin:0"><label>End</label><input value="${esc(e.end)}" oninput="D.education[${i}].end=this.value;renderCV()"></div>
+        </div>
+        <div class="fg"><label>Degree / Program</label><input value="${esc(e.degree)}" oninput="D.education[${i}].degree=this.value;renderCV()"></div>
+        <div class="fg"><label>School / Institution</label><input value="${esc(e.school)}" oninput="D.education[${i}].school=this.value;renderCV()"></div>
+      </div>`).join('')}</div>
+      <button class="addbtn" onclick="D.education.unshift({id:Date.now(),start:'',end:'',degree:'New Degree',school:'Institution'});renderEditor();renderCV()">+ Add Education</button>`;
+  }
+};
+
+EH.colors=function(){
+  const activeTheme=Object.keys(THEMES).find(k=>THEMES[k].primary===COLORS.primary&&THEMES[k].accent===COLORS.accent)||'';
+  const themeSwatches=Object.entries(THEMES).map(([k,t])=>`
+    <div class="theme-swatch ${k==='se'?'se-swatch':''} ${activeTheme===k?'active':''}"
+         style="${k!=='se'?'background:'+t.primary:''}"
+         onclick="applyTheme('${k}')"
+         title="${t.name}">${t.name}</div>`).join('');
+
+  const colorRow=(key,label)=>`
+    <div class="color-row">
+      <label>${label}</label>
+      <input type="color" value="${COLORS[key]}" oninput="setColor('${key}',this.value)">
+      <span class="color-hex" id="hex-${key}">${COLORS[key]}</span>
+    </div>`;
+
+  const langRows=D.languages.map((l,i)=>`
+    <div class="color-row">
+      <label>${esc(l.name)}</label>
+      <input type="color" value="${(COLORS.langs||['#1e2a3a','#00b4a0','#48a090','#8aa0b0'])[i]||'#8090a0'}" oninput="setLangColor(${i},this.value)">
+      <span class="color-hex" id="hex-lang${i}">${(COLORS.langs||[])[i]||''}</span>
+    </div>`).join('');
+
+  return `
+    <div class="color-section">
+      <div class="color-section-title">Preset Themes</div>
+      <div class="theme-grid">${themeSwatches}</div>
+    </div>
+    <div class="color-section">
+      <div class="color-section-title">Primary Colors</div>
+      ${colorRow('primary','Accent / Primary')}
+      ${colorRow('accent','Highlight / Orange')}
+    </div>
+    <div class="color-section">
+      <div class="color-section-title">Text Colors</div>
+      ${colorRow('dark','Headings & Name')}
+      ${colorRow('mid','Body Text')}
+      ${colorRow('light','Secondary Text')}
+    </div>
+    <div class="color-section">
+      <div class="color-section-title">Background & Borders</div>
+      ${colorRow('bg','Page Background')}
+      ${colorRow('card','Profile Bar / Cards')}
+      ${colorRow('border','Borders')}
+    </div>
+    <div class="color-section">
+      <div class="color-section-title">Language Bar Colors</div>
+      <div class="lang-color-grid">${langRows}</div>
+    </div>
+    <button class="reset-btn" onclick="applyTheme('se');renderEditor()">↺ Reset to Siemens Energy</button>`;
+};
+EH.layout=function(){
+  const sl=(key,label,min,max,step,unit)=>{
+    const v=LAYOUT[key];
+    return `<div class="slider-row">
+      <label>${label}</label>
+      <input type="range" min="${min}" max="${max}" step="${step}" value="${v}"
+        oninput="LAYOUT['${key}']=+this.value;document.getElementById('slv-${key}').textContent=this.value+'${unit}';applyLayout()">
+      <span class="slider-val" id="slv-${key}">${v}${unit}</span>
+    </div>`;
+  };
+  return `
+    <div class="color-section">
+      <div class="color-section-title">Page</div>
+      <p style="font-size:.72em;color:var(--mid);margin-bottom:8px;line-height:1.5">A4 fixed (794×1123 px). Content clipped at boundary — use sliders to fit.</p>
+      ${sl('sidebarWidth','Sidebar Width',160,320,2,'px')}
+    </div>
+    <div class="color-section">
+      <div class="color-section-title">Header</div>
+      ${sl('fsHeader','Header Font',60,140,5,'%')}
+      ${sl('fsProfile','About Me Font',60,140,5,'%')}
+    </div>
+    <div class="color-section">
+      <div class="color-section-title">Sidebar Modules</div>
+      ${sl('fsLeft','⬜ Sidebar (master)',60,140,5,'%')}
+      ${sl('fsSkills','  ↳ Skills',60,140,5,'%')}
+      ${sl('fsLangs','  ↳ Languages',60,140,5,'%')}
+      ${sl('fsCerts','  ↳ Certificates',60,140,5,'%')}
+      ${sl('spacingL','  ↳ Section Gap',40,160,5,'%')}
+    </div>
+    <div class="color-section">
+      <div class="color-section-title">Main Column Modules</div>
+      ${sl('fsRight','⬜ Main (master)',60,140,5,'%')}
+      ${sl('fsExp','  ↳ Experience',60,140,5,'%')}
+      ${sl('fsEdu','  ↳ Education',60,140,5,'%')}
+      ${sl('spacingR','  ↳ Entry Spacing',40,160,5,'%')}
+    </div>
+    <button class="reset-btn" onclick="resetLayout()">↺ Reset All Layout</button>`;
+};
+// ── SKILL TAGS ────────────────────────────────────────────────────────────────
+function rmSkill(key,val){D.skills[key]=D.skills[key].filter(s=>s!==val);renderEditor();renderCV();}
+function addSkill(e,key){
+  if(e.key!=='Enter'&&e.key!==',') return;
+  e.preventDefault();
+  const v=e.target.value.trim().replace(/,$/,'');
+  if(v&&!D.skills[key].includes(v)){D.skills[key].push(v);renderEditor();renderCV();}
+}
+
+// ── PHOTO ─────────────────────────────────────────────────────────────────────
+function uploadPhoto(ev){
+  const f=ev.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=e=>{D.personal.photo=e.target.result;renderEditor();renderCV();};
+  r.readAsDataURL(f);
+}
+
+// ── TABS & LANG ───────────────────────────────────────────────────────────────
+function switchTab(t){
+  tab=t;
+  document.querySelectorAll('.etab').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));
+  renderEditor();
+}
+function setLang(l){
+  lang=l;
+  document.querySelectorAll('.lbtn').forEach(b=>b.classList.toggle('active',b.dataset.lang===l));
+  renderCV();
+}
+function toggleEditor(){
+  editorOpen=!editorOpen;
+  document.getElementById('ep').classList.toggle('collapsed',!editorOpen);
+  const btn=document.getElementById('etoggle');
+  btn.textContent=editorOpen?'‹':'›';
+  btn.style.left=editorOpen?'370px':'0';
+  setTimeout(fitCV,320);
+}
+
+// ── IMPORT / EXPORT JSON ──────────────────────────────────────────────────────
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(D,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`cv_${D.personal.name.replace(/\s+/g,'_')}_${lang}.json`;
+  a.click(); URL.revokeObjectURL(a.href);
+}
+function importJSON(ev){
+  const f=ev.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=e=>{try{D=JSON.parse(e.target.result);renderEditor();renderCV();}catch{alert('Invalid JSON file.');}};
+  r.readAsText(f); ev.target.value='';
+}
+
+// ── IMPORT TEXT MODAL ─────────────────────────────────────────────────────────
+function openIT(){
+  document.getElementById('itmodal').classList.add('open');
+  document.getElementById('it-pv').style.display='none';
+  document.getElementById('it-apply-btn').style.display='none';
+  document.getElementById('it-ta').value='';
+  parsedData=null;
+}
+function closeIT(){document.getElementById('itmodal').classList.remove('open');}
+document.getElementById('itmodal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeIT();});
+
+function runParse(){
+  const raw=document.getElementById('it-ta').value.trim();
+  if(!raw){alert('Please paste some CV text first.');return;}
+  parsedData=parseRawCV(raw);
+  showParsePreview(parsedData);
+}
+function applyParsed(){
+  if(!parsedData) return;
+  const p=parsedData;
+  if(p.personal) Object.keys(p.personal).forEach(k=>{if(p.personal[k]) D.personal[k]=p.personal[k];});
+  if(p.profile) D.profile=p.profile;
+  if(p.experience&&p.experience.length) D.experience=p.experience;
+  if(p.education&&p.education.length) D.education=p.education;
+  if(p.skills){['technical','tools','domain','soft'].forEach(k=>{if(p.skills[k]&&p.skills[k].length) D.skills[k]=p.skills[k];});}
+  if(p.languages&&p.languages.length) D.languages=p.languages;
+  if(p.certificates&&p.certificates.length) D.certificates=p.certificates;
+  closeIT(); renderEditor(); renderCV();
+}
+function showParsePreview(p){
+  const pv=document.getElementById('it-pv');
+  const ok=(lbl,v)=>`<div class="prv-ok">✓ <strong>${lbl}:</strong> ${esc(String(v))}</div>`;
+  const no=(lbl)=>`<div class="prv-warn">— ${lbl}: not detected</div>`;
+  let rows=[];
+  if(p.personal){
+    if(p.personal.name) rows.push(ok('Name',p.personal.name));
+    if(p.personal.title) rows.push(ok('Title',p.personal.title));
+    if(p.personal.email) rows.push(ok('Email',p.personal.email));
+    if(p.personal.phone) rows.push(ok('Phone',p.personal.phone));
+  }
+  if(p.profile) rows.push(ok('Profile',p.profile.substring(0,80)+'…'));
+  rows.push(p.experience&&p.experience.length ? ok('Experience',p.experience.length+' positions') : no('Experience'));
+  rows.push(p.education&&p.education.length ? ok('Education',p.education.length+' entries') : no('Education'));
+  const sc=p.skills?Object.values(p.skills).flat().length:0;
+  if(sc) rows.push(ok('Skills',sc+' items'));
+  if(p.languages&&p.languages.length) rows.push(ok('Languages',p.languages.map(l=>l.name).join(', ')));
+  if(p.certificates&&p.certificates.length) rows.push(ok('Certificates',p.certificates.length+' found'));
+  pv.innerHTML=`<h4>Parse Results</h4>${rows.join('')}`;
+  pv.style.display='block';
+  document.getElementById('it-apply-btn').style.display='inline-block';
+}
+
+function parseRawCV(raw){
+  const lines=raw.split(/\r?\n/).map(l=>l.trim());
+  const result={personal:{},skills:{technical:[],tools:[],domain:[],soft:[]},languages:[],certificates:[],profile:'',experience:[],education:[]};
+  const emailM=raw.match(/[\w.+\-]+@[\w\-]+\.[a-zA-Z]{2,}/);
+  if(emailM) result.personal.email=emailM[0];
+  const phoneM=raw.match(/\+?[\d][\d\s\-().]{7,18}[\d]/);
+  if(phoneM) result.personal.phone=phoneM[0].trim();
+  const liM=raw.match(/linkedin\.com\/in\/([\w\-]+)/i)||raw.match(/\bIN\s+([\w\-]+)/);
+  if(liM) result.personal.linkedin=liM[1];
+  const ghM=raw.match(/github\.com\/([\w\-]+)/i)||raw.match(/\bGH\s+([\w\-]+)/);
+  if(ghM) result.personal.github=ghM[1];
+  const MONTHS='Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|Okt|Dez|Mai';
+  const dateRx=new RegExp(`^(?:${MONTHS})[.\\s]\\d{4}$`,'i');
+  const rangRx=new RegExp(`((?:${MONTHS})[.\\s]\\d{4})\\s*[–\\-›]+\\s*((?:${MONTHS})[.\\s]\\d{4}|Present|Heute|Présent|Presente|PRESENT|HEUTE)`,'i');
+  const sRx=/^(?:\d+\s*)?(CONTACT|SKILLS|FÄHIGKEITEN|KENNTNISSE|LANGUAGES?|SPRACHEN|CERTIFICATES?|ZERTIFIKATE|PROFILE|PROFIL|EXPERIENCE|BERUFSERFAHRUNG|ERFAHRUNG|EDUCATION|AUSBILDUNG|KOMPETENZ|COMPETENCIAS|COMPÉTENCES|IDIOMAS|LANGUES|CERTIFICATIONS?)$/i;
+  const preSection=[];
+  for(let j=0;j<lines.length;j++){if(sRx.test(lines[j])) break; if(lines[j]) preSection.push(lines[j]);}
+  const cleanPre=preSection.filter(l=>!l.match(/[\w.+\-]+@[\w\-]+\.[a-zA-Z]{2,}/)&&!l.match(/\+?[\d][\d\s\-().]{6,}/)&&!l.match(/linkedin|github/i)&&!l.match(/^(IN|GH|EMAIL|PHONE|BASE|KONTAKT)\s+/i));
+  if(cleanPre[0]) result.personal.name=cleanPre[0];
+  if(cleanPre[1]) result.personal.title=cleanPre[1];
+  if(cleanPre[2]&&!cleanPre[2].match(/^\d/)) result.personal.location=cleanPre[2];
+  let i=0, curSec=null;
+  while(i<lines.length){
+    const l=lines[i];
+    if(sRx.test(l)){curSec=l.replace(/^\d+\s*/,'').toUpperCase();i++;continue;}
+    if(!curSec){i++;continue;}
+    if(curSec.match(/^PROF/i)){
+      const buf=[];
+      while(i<lines.length&&!sRx.test(lines[i])){if(lines[i]) buf.push(lines[i]);i++;}
+      result.profile=buf.join('\n'); continue;
+    }
+    if(curSec.match(/^(EXPERIENCE|BERUFSERFAHRUNG|ERFAHRUNG|EXPERIENCIA|EXP)/i)){
+      const entries=[];
+      while(i<lines.length&&!sRx.test(lines[i])){
+        const l2=lines[i];
+        const rm=l2.match(rangRx);
+        if(rm||dateRx.test(l2)){
+          const e={id:Date.now()+entries.length,start:'',end:'',current:false,title:'',subtitle:'',company:'',bullets:[]};
+          if(rm){
+            e.start=rm[1].replace('.',' ').trim();
+            const endStr=rm[2];
+            if(endStr.match(/present|heute|présent|presente/i)){e.current=true;e.end='';}
+            else{e.end=endStr.replace('.',' ').trim();}
+            i++;
+          } else {
+            e.start=l2.replace('.',' ').trim();i++;
+            if(i<lines.length){
+              const n=lines[i];
+              if(n.match(/^[›>]+$/)||n==='-'){i++;}
+              if(i<lines.length){
+                const n2=lines[i];
+                if(dateRx.test(n2)){e.end=n2.replace('.',' ').trim();i++;}
+                else if(/present|heute|présent|presente/i.test(n2)){e.current=true;i++;}
+              }
+            }
+          }
+          let ll=0;
+          while(i<lines.length&&!sRx.test(lines[i])&&ll<20){
+            const t=lines[i];
+            if(!t){i++;ll++;continue;}
+            if(rangRx.test(t)||dateRx.test(t)) break;
+            if(!e.title){e.title=t;i++;ll++;continue;}
+            if(!e.company&&!t.match(/^[›•\-·]/)){e.company=t.replace(/·/g,' · ');i++;ll++;continue;}
+            const bt=t.replace(/^[›•\-·]\s*/,'');
+            if(bt) e.bullets.push(bt);
+            i++;ll++;
+          }
+          entries.push(e);
+        } else {i++;}
+      }
+      if(entries.length) result.experience=entries;
+      continue;
+    }
+    if(curSec.match(/^(EDUCATION|AUSBILDUNG|EDUCACI|FORMATION)/i)){
+      const entries=[];
+      while(i<lines.length&&!sRx.test(lines[i])){
+        const l2=lines[i];
+        const rm=l2.match(rangRx);
+        const yr2=l2.match(/(\d{4})\s*[–\-]\s*(\d{4})/);
+        if(rm||dateRx.test(l2)||yr2){
+          const e={id:Date.now()+entries.length,start:'',end:'',degree:'',school:''};
+          if(yr2){e.start=yr2[1];e.end=yr2[2];i++;}
+          else if(rm){e.start=rm[1].replace('.',' ').trim();e.end=rm[2].replace('.',' ').trim();i++;}
+          else{e.start=l2.replace('.',' ').trim();i++;
+            if(i<lines.length&&(dateRx.test(lines[i])||lines[i].match(/\d{4}/))){e.end=lines[i];i++;}}
+          let ll=0;
+          while(i<lines.length&&!sRx.test(lines[i])&&ll<5){
+            const t=lines[i];
+            if(!t){i++;ll++;continue;}
+            if(rangRx.test(t)||dateRx.test(t)||t.match(/\d{4}\s*[–\-]\s*\d{4}/)) break;
+            if(!e.degree){e.degree=t;i++;ll++;continue;}
+            if(!e.school){e.school=t;i++;ll++;continue;}
+            break;
+          }
+          entries.push(e);
+        } else {i++;}
+      }
+      if(entries.length) result.education=entries;
+      continue;
+    }
+    if(curSec.match(/^(LANG|SPRA|IDIOM)/i)){
+      while(i<lines.length&&!sRx.test(lines[i])){
+        const l2=lines[i];i++;
+        if(!l2) continue;
+        const m=l2.match(/^(.+?)\s+(Native|Muttersprache|Nativo|Langue maternelle|C2|C1|B2|B1|A2|A1)$/i);
+        if(m) result.languages.push({name:m[1].trim(),level:m[2]});
+      }
+      continue;
+    }
+    if(curSec.match(/^(SKILL|FÄHI|COMP|KENNT)/i)){
+      while(i<lines.length&&!sRx.test(lines[i])){
+        const l2=lines[i];i++;
+        if(!l2) continue;
+        const techM=l2.match(/^(?:Technical|Technisch|Técnico|Technique)[:\s]+(.+)/i);
+        const toolM=l2.match(/^(?:Tools?)[:\s]+(.+)/i);
+        const domM=l2.match(/^(?:Domain|Domäne|Dominio|Domaine)[:\s]+(.+)/i);
+        const softM=l2.match(/^(?:Soft[- ]?Skills?|Savoir)[:\s]+(.+)/i);
+        if(techM) result.skills.technical.push(...techM[1].split(/[,;·]+/).map(s=>s.trim()).filter(Boolean));
+        else if(toolM) result.skills.tools.push(...toolM[1].split(/[,;·]+/).map(s=>s.trim()).filter(Boolean));
+        else if(domM) result.skills.domain.push(...domM[1].split(/[,;·]+/).map(s=>s.trim()).filter(Boolean));
+        else if(softM) result.skills.soft.push(...softM[1].split(/[,;·]+/).map(s=>s.trim()).filter(Boolean));
+        else{const items=l2.split(/[,;·]+/).map(s=>s.trim()).filter(s=>s&&s.length>1&&s.length<30);if(items.length>1) result.skills.technical.push(...items);}
+      }
+      continue;
+    }
+    if(curSec.match(/^(CERT|ZERTI)/i)){
+      let buf=[];
+      while(i<lines.length&&!sRx.test(lines[i])){
+        const l2=lines[i];i++;
+        if(!l2){if(buf.length){result.certificates.push({title:buf[0]||'',issuer:buf[1]||'',date:buf[2]||''});buf=[];}continue;}
+        buf.push(l2);
+        if(buf.length>=3){result.certificates.push({title:buf[0],issuer:buf[1],date:buf[2]});buf=[];}
+      }
+      if(buf.length) result.certificates.push({title:buf[0]||'',issuer:buf[1]||'',date:buf[2]||''});
+      continue;
+    }
+    i++;
+  }
+  return result;
+}
+
+// ── SAVE / LOAD ───────────────────────────────────────────────────────────────
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+function resetLayout(){
+  LAYOUT={sidebarWidth:238,fsHeader:100,fsProfile:100,fsLeft:100,fsRight:100,fsSkills:100,fsLangs:100,fsCerts:100,fsExp:100,fsEdu:100,spacingR:100,spacingL:100};
+  applyLayout();
+  if(tab==='layout') renderEditor();
+}
+function saveData(){
+  try{
+    localStorage.setItem('cvData',JSON.stringify(D));
+    localStorage.setItem('cvLayout',JSON.stringify(LAYOUT));
+    localStorage.setItem('cvColors',JSON.stringify(COLORS));
+    showToast('💾 Saved to browser storage');
+  }catch(e){showToast('⚠ Save failed: '+e.message);}
+}
+function loadData(){
+  try{
+    const d=localStorage.getItem('cvData');
+    const l=localStorage.getItem('cvLayout');
+    const c=localStorage.getItem('cvColors');
+    if(d) D=JSON.parse(d);
+    if(l) LAYOUT=JSON.parse(l);
+    if(c) COLORS=JSON.parse(c);
+  }catch(e){console.warn('Load failed',e);}
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+loadData();
+applyColors();
+applyLayout();
+renderEditor();
+requestAnimationFrame(()=>requestAnimationFrame(fitCV));
+</script>
+</body>
+</html>

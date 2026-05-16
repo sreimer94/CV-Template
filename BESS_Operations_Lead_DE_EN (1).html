@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BESS Monitoring & Diagnostics Operations Lead - Siemens Energy</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            line-height: 1.6; 
+            color: #333; 
+            background: linear-gradient(135deg, #00b4a0 0%, #007a6e 100%); 
+            padding: 20px; 
+        }
+        .container { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            background: white; 
+            border-radius: 15px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+            overflow: hidden; 
+        }
+        header { 
+            background: linear-gradient(135deg, #00b4a0 0%, #007a6e 100%); 
+            color: white; 
+            padding: 60px 40px; 
+            text-align: center; 
+        }
+        header h1 { font-size: 3em; margin-bottom: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+        header p { font-size: 1.3em; opacity: 0.95; margin: 10px 0; }
+        .badge { 
+            display: inline-block; 
+            background: rgba(255,255,255,0.2); 
+            padding: 10px 25px; 
+            border-radius: 25px; 
+            margin: 5px; 
+            font-size: 0.9em; 
+        }
+        .lang-toggle {
+            background: #2c3e50;
+            padding: 15px;
+            text-align: center;
+        }
+        .lang-btn {
+            background: #00b4a0;
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            margin: 0 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .lang-btn:hover { background: #007a6e; transform: translateY(-2px); }
+        .lang-btn.active { background: #007a6e; box-shadow: 0 0 10px rgba(0,180,160,0.5); }
+        nav { 
+            background: #2c3e50; 
+            padding: 15px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        nav ul { 
+            list-style: none; 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 10px; 
+            justify-content: center; 
+        }
+        nav a { 
+            color: white; 
+            text-decoration: none; 
+            padding: 10px 20px; 
+            border-radius: 5px; 
+            transition: all 0.3s; 
+            font-weight: 500;
+        }
+        nav a:hover { background: #00b4a0; transform: translateY(-2px); }
+        .content { padding: 50px; }
+        .section { 
+            margin-bottom: 60px; 
+            padding: 40px; 
+            background: #f8f9fa; 
+            border-radius: 15px; 
+            border-left: 6px solid #00b4a0; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .section h2 { 
+            color: #00b4a0; 
+            font-size: 2.5em; 
+            margin-bottom: 25px; 
+            padding-bottom: 15px; 
+            border-bottom: 3px solid #e0e0e0; 
+        }
+        .section h3 { 
+            color: #2c3e50; 
+            font-size: 1.8em; 
+            margin-top: 30px; 
+            margin-bottom: 20px; 
+        }
+        .section h4 { 
+            color: #34495e; 
+            font-size: 1.4em; 
+            margin-top: 25px; 
+            margin-bottom: 15px; 
+        }
+        .info-box { 
+            background: #e0f7f5; 
+            border-left: 5px solid #00b4a0; 
+            padding: 25px; 
+            margin: 25px 0; 
+            border-radius: 10px; 
+        }
+        .success-box { 
+            background: #d4edda; 
+            border-left: 5px solid #28a745; 
+            padding: 25px; 
+            margin: 25px 0; 
+            border-radius: 10px; 
+        }
+        .highlight-box { 
+            background: linear-gradient(135deg, #00b4a0 0%, #007a6e 100%); 
+            color: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            margin: 25px 0; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .highlight-box h3 { color: white; margin-top: 0; }
+        .job-card {
+            background: white;
+            padding: 30px;
+            margin: 20px 0;
+            border-radius: 12px;
+            border-left: 5px solid #00b4a0;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        .job-card:hover {
+            transform: translateX(8px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 25px 0; 
+            background: white; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        th { 
+            background: #00b4a0; 
+            color: white; 
+            padding: 18px; 
+            text-align: left; 
+            font-weight: 600; 
+            font-size: 1.1em;
+        }
+        td { 
+            padding: 15px 18px; 
+            border-bottom: 1px solid #e0e0e0; 
+        }
+        tr:hover { background: #f8f9fa; }
+        tr:last-child td { border-bottom: none; }
+        ul { margin-left: 30px; margin-top: 15px; }
+        li { margin: 10px 0; }
+        .checklist { list-style: none; margin-left: 0; }
+        .checklist li { padding-left: 35px; position: relative; margin: 12px 0; }
+        .checklist li:before { 
+            content: "✓"; 
+            position: absolute; 
+            left: 0; 
+            color: #28a745; 
+            font-weight: bold; 
+            font-size: 1.4em; 
+        }
+        .lang-content { display: none; }
+        .lang-content.active { display: block; }
+        footer { 
+            background: #2c3e50; 
+            color: white; 
+            padding: 40px; 
+            text-align: center; 
+        }
+        footer a { color: #00b4a0; text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+        @media (max-width: 768px) {
+            header h1 { font-size: 2em; }
+            .content { padding: 25px; }
+            .section { padding: 25px; }
+            nav ul { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚡ BESS Monitoring &amp; Diagnostics Operations Lead</h1>
+            <p>Battery Energy Storage System - Diagnostics Center</p>
+            <p>Siemens Energy | Grid Technologies | Service</p>
+            <div>
+                <span class="badge">🇩🇪 Erlangen | Mülheim | Hamburg</span>
+                <span class="badge">🏢 Hybrid (Remote/Office)</span>
+                <span class="badge">⏰ Full-time</span>
+            </div>
+        </header>
+        
+        <div class="lang-toggle">
+            <button class="lang-btn active" onclick="switchLang('de')">🇩🇪 Deutsch</button>
+            <button class="lang-btn" onclick="switchLang('en')">🇬🇧 English</button>
+        </div>
+        
+        <!-- DEUTSCHE VERSION -->
+        <div id="content-de" class="lang-content active">
+            <nav>
+                <ul>
+                    <li><a href="#einfuehrung-de">📖 Einführung</a></li>
+                    <li><a href="#position-de">💼 Die Position</a></li>
+                    <li><a href="#aufgaben-de">🎯 Aufgaben</a></li>
+                    <li><a href="#anforderungen-de">✅ Anforderungen</a></li>
+                    <li><a href="#team-de">👥 Das Team</a></li>
+                    <li><a href="#benefits-de">🎁 Benefits</a></li>
+                </ul>
+            </nav>
+            
+            <div class="content">
+                <!-- EINFÜHRUNG -->
+                <div class="section" id="einfuehrung-de">
+                    <h2>📖 Einführung in die Position</h2>
+                    
+                    <div class="highlight-box">
+                        <h3>Gestalten Sie die Zukunft der Energiespeicherung!</h3>
+                        <p style="font-size: 1.2em; margin-top: 15px;">Als <strong>BESS Monitoring and Diagnostics Operations Lead</strong> übernehmen Sie eine Schlüsselrolle in der Energiewende. Sie leiten das Monitoring- und Diagnostik-Team für Batteriespeichersysteme (BESS) und stellen sicher, dass diese kritischen Infrastrukturen zuverlässig, effizient und optimal funktionieren.</p>
+                    </div>
+                    
+                    <h3>🔋 Was sind BESS (Battery Energy Storage Systems)?</h3>
+                    <div class="info-box">
+                        <p><strong>Batteriespeichersysteme sind das Rückgrat der Energiewende!</strong></p>
+                        <p style="margin-top: 15px;">BESS ermöglichen:</p>
+                        <ul>
+                            <li><strong>Integration erneuerbarer Energien</strong> - Speicherung von Solar- und Windenergie</li>
+                            <li><strong>Netzstabilisierung</strong> - Ausgleich von Lastspitzen und Frequenzregelung</li>
+                            <li><strong>Versorgungssicherheit</strong> - Backup-Stromversorgung</li>
+                            <li><strong>Wirtschaftlichkeit</strong> - Optimierung der Energiekosten</li>
+                        </ul>
+                    </div>
+                    
+                    <h3>🎯 Warum ist diese Position so wichtig?</h3>
+                    <p>In dieser dynamischen und zukunftsweisenden Rolle sind Sie verantwortlich für:</p>
+                    
+                    <div class="job-card">
+                        <h4>1. 📊 Operative Exzellenz</h4>
+                        <p>Sie überwachen BESS-Anlagen in Echtzeit über mehrere Standorte hinweg und stellen maximale Verfügbarkeit und Effizienz sicher.</p>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>2. 🔍 Technische Führung</h4>
+                        <p>Sie leiten Diagnosen, Fehleranalysen und Root-Cause-Analysen, um Ausfallzeiten zu minimieren und die Systemleistung zu optimieren.</p>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>3. 🚀 Strategische Entwicklung</h4>
+                        <p>Sie entwickeln das BESS Diagnostics Center (BDC) weiter und implementieren zukunftsweisende Monitoring- und Wartungsstrategien.</p>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>4. 👥 Team-Leadership</h4>
+                        <p>Sie führen, mentoren und entwickeln Ihr Team und sind Vorbild mit einer "Customer First"-Mentalität.</p>
+                    </div>
+                </div>
+                
+                <!-- DIE POSITION -->
+                <div class="section" id="position-de">
+                    <h2>💼 Ein typischer Tag in Ihrer Rolle</h2>
+                    
+                    <div class="highlight-box">
+                        <h3>Ihr Impact auf die Energiewende</h3>
+                        <p style="font-size: 1.1em;">In dieser wichtigen und dynamischen Rolle als BESS Monitoring and Diagnostics Operations Lead leiten Sie die Weiterentwicklung des Monitoring- und Diagnostik-Teams und setzen mit einer <strong>Customer First-Haltung</strong> ein Vorbild.</p>
+                    </div>
+                    
+                    <h3>🔄 Ihre täglichen Verantwortlichkeiten</h3>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Bereich</th>
+                                <th>Beschreibung</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Operative Überwachung</strong></td>
+                                <td>Überwachung der BESS-Performance über mehrere Standorte in Echtzeit</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Technische Diagnose</strong></td>
+                                <td>Fehlerdiagnose, Troubleshooting und Root-Cause-Analyse</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Datenanalyse</strong></td>
+                                <td>Analyse von Performance-Daten und Implementierung von Optimierungen</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Predictive Maintenance</strong></td>
+                                <td>Entwicklung vorausschauender Wartungsstrategien mit Data Analytics</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Zusammenarbeit</strong></td>
+                                <td>Cross-funktionale Koordination mit Engineering, Wartung und Inbetriebnahme</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Team-Entwicklung</strong></td>
+                                <td>Leadership, Mentoring und Training des Teams</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- AUFGABEN -->
+                <div class="section" id="aufgaben-de">
+                    <h2>🎯 Wie Sie einen Unterschied machen</h2>
+                    
+                    <h3>Ihre Kernaufgaben</h3>
+                    
+                    <div class="job-card">
+                        <h4>📡 Real-time Monitoring &amp; Dokumentation</h4>
+                        <ul>
+                            <li>Echtzeit-Überwachung der BESS-Performance über mehrere Standorte</li>
+                            <li>Sicherstellung des kontinuierlichen Betriebs und maximaler Effizienz</li>
+                            <li>Umfassende Dokumentation aller Betriebsparameter</li>
+                            <li>Frühzeitige Erkennung von Anomalien und Abweichungen</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>🔧 Diagnostik &amp; Troubleshooting</h4>
+                        <ul>
+                            <li>Leitung von Diagnosen für BESS-Komponenten (Batterien, Wechselrichter, Steuerungssysteme)</li>
+                            <li>Durchführung von Root-Cause-Analysen zur Minimierung von Ausfallzeiten</li>
+                            <li>Remote-Diagnose und Fehlerbeseitigung</li>
+                            <li>Entwicklung von Lösungsstrategien für komplexe technische Probleme</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>📊 Performance-Analyse &amp; Optimierung</h4>
+                        <ul>
+                            <li>Analyse von Performance-Daten gemäß Industriestandards und Best Practices</li>
+                            <li>Implementierung von Optimierungsmaßnahmen</li>
+                            <li>Benchmarking und KPI-Tracking</li>
+                            <li>Kontinuierliche Verbesserung der Systemleistung</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>🤖 Predictive Maintenance</h4>
+                        <ul>
+                            <li>Entwicklung und Implementierung vorausschauender Wartungsstrategien</li>
+                            <li>Nutzung von Data Analytics und Remote-Monitoring-Tools</li>
+                            <li>Einsatz von KI/ML für Vorhersagemodelle</li>
+                            <li>Reduzierung ungeplanter Ausfälle durch proaktive Wartung</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>🤝 Cross-funktionale Zusammenarbeit</h4>
+                        <ul>
+                            <li>Enge Zusammenarbeit mit Engineering-Teams</li>
+                            <li>Koordination mit Wartungs- und Inbetriebnahme-Teams</li>
+                            <li>Abstimmung der Prozesse mit Projektzielen</li>
+                            <li>Schnittstelle zu Kunden und Stakeholdern</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>👥 Leadership &amp; Team-Entwicklung</h4>
+                        <ul>
+                            <li>Führung und Mentoring des Monitoring- und Diagnostik-Teams</li>
+                            <li>Training in neuen Monitoring-, Diagnostik- und Steuerungstechnologien</li>
+                            <li>Entwicklung von Prozessen und Verfahren für das BDC</li>
+                            <li>Schaffung der Grundlagen für den Teamerfolg</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- ANFORDERUNGEN -->
+                <div class="section" id="anforderungen-de">
+                    <h2>✅ Was Sie mitbringen</h2>
+                    
+                    <h3>Formale Qualifikationen</h3>
+                    <div class="info-box">
+                        <ul class="checklist">
+                            <li><strong>Universitätsabschluss</strong> in Ingenieurwesen, Energietechnik oder verwandtem Bereich</li>
+                            <li>Oder <strong>gleichwertige Kombination</strong> aus Ausbildung und Erfahrung</li>
+                        </ul>
+                    </div>
+                    
+                    <h3>Berufserfahrung</h3>
+                    <div class="job-card">
+                        <h4>🏭 Operative &amp; Kundenerfahrung</h4>
+                        <ul>
+                            <li><strong>Langfristige relevante Erfahrung</strong> in Energieinfrastruktur oder Kraftwerken</li>
+                            <li><strong>Mehrjährige Erfahrung</strong> in BESS-Betrieb, Monitoring und Diagnostik</li>
+                            <li><strong>Kundenkontakt</strong> - Erfahrung in kundenorientierten Rollen</li>
+                        </ul>
+                    </div>
+                    
+                    <h3>Technische Expertise</h3>
+                    <div class="job-card">
+                        <h4>🔋 BESS-Technologien</h4>
+                        <p><strong>Fundierte Kenntnisse in:</strong></p>
+                        <ul>
+                            <li><strong>Batterien</strong> - Lithium-Ionen, Technologien, Degradation</li>
+                            <li><strong>Power Conversion Systems</strong> - Wechselrichter, Gleichrichter</li>
+                            <li><strong>Transformatoren</strong> - Mittel- und Hochspannungstechnik</li>
+                            <li><strong>Steuerungssysteme</strong> - SCADA, PLC, BMS</li>
+                            <li><strong>Monitoring-Systeme</strong> - Echtzeit-Überwachung, Alarmsysteme</li>
+                            <li><strong>Digitalisierung</strong> - IoT, Cloud-Plattformen, Data Analytics</li>
+                            <li><strong>Energy Management Systems (EMS)</strong> - Optimierung, Steuerung</li>
+                        </ul>
+                    </div>
+                    
+                    <h3>Leadership &amp; Soft Skills</h3>
+                    <div class="job-card">
+                        <h4>👨‍💼 Führungsqualitäten</h4>
+                        <ul>
+                            <li><strong>Nachgewiesene Führungserfahrung</strong> mit cross-funktionalen Teams</li>
+                            <li><strong>Starke Kollaborationsfähigkeiten</strong> über Abteilungsgrenzen hinweg</li>
+                            <li><strong>Mentoring &amp; Coaching</strong> - Entwicklung von Teammitgliedern</li>
+                            <li><strong>Customer First-Mentalität</strong> - Kundenorientierung als Vorbild</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>🔍 Analytische Fähigkeiten</h4>
+                        <ul>
+                            <li><strong>Fortgeschrittene Analyse-Skills</strong> - Dateninterpretation, Mustererkennung</li>
+                            <li><strong>Troubleshooting-Expertise</strong> - Systematische Fehlersuche</li>
+                            <li><strong>Remote-Diagnose</strong> - Fernwartung und -analyse</li>
+                            <li><strong>Fault Detection</strong> - Früherkennung von Störungen</li>
+                            <li><strong>Digitale Tools</strong> - Ticketing-Systeme, Monitoring-Software</li>
+                        </ul>
+                    </div>
+                    
+                    <h3>Weitere Qualifikationen</h3>
+                    <div class="job-card">
+                        <h4>📋 Service &amp; Standards</h4>
+                        <ul>
+                            <li><strong>Service-Modelle</strong> - LTSAs (Long-Term Service Agreements)</li>
+                            <li><strong>Performance Guarantees</strong> - Verfügbarkeits- und Leistungsgarantien</li>
+                            <li><strong>RAMS</strong> - Reliability, Availability, Maintainability, Safety</li>
+                            <li><strong>Standards &amp; Grid Codes</strong> - Relevante Normen und Netzanschlussbedingungen</li>
+                            <li><strong>Marktanforderungen</strong> - Verständnis der Energiemärkte</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>💬 Kommunikation &amp; Projektmanagement</h4>
+                        <ul>
+                            <li><strong>Projektmanagement-Skills</strong> - Planung, Steuerung, Controlling</li>
+                            <li><strong>Starke Kommunikationsfähigkeiten</strong> in Englisch (weitere europäische Sprachen von Vorteil)</li>
+                            <li><strong>Präsentationsfähigkeiten</strong> - Technische Inhalte verständlich vermitteln</li>
+                            <li><strong>Dokumentation</strong> - Technische Berichte und Analysen</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- TEAM -->
+                <div class="section" id="team-de">
+                    <h2>👥 Über das Team</h2>
+                    
+                    <div class="highlight-box">
+                        <h3>Grid Technologies Division</h3>
+                        <p style="font-size: 1.1em;">Unsere Grid Technology Division ermöglicht ein <strong>zuverlässiges, nachhaltiges und digitales Stromnetz</strong>. Das Stromnetz ist das Rückgrat der Energiewende.</p>
+                    </div>
+                    
+                    <h3>🌍 Unser Portfolio</h3>
+                    <div class="job-card">
+                        <p>Siemens Energy bietet ein führendes Portfolio und Lösungen in:</p>
+                        <ul>
+                            <li><strong>HVDC-Übertragung</strong> - Hochspannungs-Gleichstrom-Übertragung</li>
+                            <li><strong>Netzstabilisierung &amp; Speicherung</strong> - BESS, FACTS</li>
+                            <li><strong>Hochspannungsschaltanlagen</strong> - GIS, AIS</li>
+                            <li><strong>Transformatoren</strong> - Leistungstransformatoren</li>
+                            <li><strong>Digitale Netztechnologie</strong> - Smart Grid Solutions</li>
+                        </ul>
+                    </div>
+                    
+                    <h3>⚡ Wer ist Siemens Energy?</h3>
+                    <div class="info-box">
+                        <p><strong>Bei Siemens Energy sind wir mehr als nur ein Energietechnologie-Unternehmen.</strong></p>
+                        <p style="margin-top: 15px;">Mit <strong>~100.000 engagierten Mitarbeitern</strong> in mehr als <strong>90 Ländern</strong> entwickeln wir die Energiesysteme der Zukunft und stellen sicher, dass der wachsende Energiebedarf der globalen Gemeinschaft zuverlässig und nachhaltig gedeckt wird.</p>
+                        <p style="margin-top: 15px;">Die in unseren Forschungsabteilungen und Fabriken entwickelten Technologien treiben die Energiewende voran und bilden die Grundlage für <strong>ein Sechstel der weltweiten Stromerzeugung</strong>.</p>
+                    </div>
+                </div>
+                
+                <!-- BENEFITS -->
+                <div class="section" id="benefits-de">
+                    <h2>🎁 Ihre Benefits</h2>
+                    
+                    <div class="success-box">
+                        <h3>Was wir Ihnen bieten</h3>
+                        <p>Zusätzlich zu einem attraktiven, marktgerechten Vergütungspaket erwarten Sie:</p>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>💰 Vergütung &amp; Altersvorsorge</h4>
+                        <ul>
+                            <li>Attraktives Vergütungspaket in Linie mit dem Markt</li>
+                            <li>Arbeitgeberfinanzierte betriebliche Altersvorsorge</li>
+                            <li>Möglichkeit, Siemens Energy-Aktionär zu werden</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>🏢 Flexible Arbeit</h4>
+                        <ul>
+                            <li><strong>Hybrid-Modell</strong> - Flexibles und mobiles Arbeiten</li>
+                            <li><strong>Remote-Möglichkeiten</strong> - Work from Home</li>
+                            <li><strong>Inspirierende Büros</strong> - Raum für Kollaboration und Kreativität</li>
+                            <li><strong>Standorte</strong> - Erlangen, Mülheim an der Ruhr, Hamburg</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>📚 Entwicklung &amp; Weiterbildung</h4>
+                        <ul>
+                            <li><strong>Professionelle Entwicklung</strong> - Individuelle Entwicklungspläne</li>
+                            <li><strong>Selbstbestimmtes Lernen</strong> - Vielfältige Lernmaterialien</li>
+                            <li><strong>Attraktive Programme</strong> - Schulungen, Zertifizierungen</li>
+                            <li><strong>Karrierepfade</strong> - Klare Entwicklungsmöglichkeiten</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>👨‍👩‍👧‍👦 Work-Life-Balance</h4>
+                        <ul>
+                            <li><strong>Flexible Arbeitszeitmodelle</strong> - Anpassung an Ihre Bedürfnisse</li>
+                            <li><strong>Kinderbetreuung</strong> - An vielen Standorten verfügbar</li>
+                            <li><strong>Teilzeit-Optionen</strong> - Probeweise Teilzeit möglich</li>
+                            <li><strong>Sabbatical</strong> - Auszeiten für persönliche Projekte</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>🌈 Diversity &amp; Inclusion</h4>
+                        <ul>
+                            <li><strong>Vielfalt</strong> - Über 130 Nationalitäten</li>
+                            <li><strong>Chancengleichheit</strong> - Keine Diskriminierung</li>
+                            <li><strong>Inklusion</strong> - Bewerbungen von Menschen mit Behinderungen willkommen</li>
+                            <li><strong>Character</strong> - Wir feiern Persönlichkeit</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ENGLISH VERSION -->
+        <div id="content-en" class="lang-content">
+            <nav>
+                <ul>
+                    <li><a href="#introduction-en">📖 Introduction</a></li>
+                    <li><a href="#position-en">💼 The Position</a></li>
+                    <li><a href="#responsibilities-en">🎯 Responsibilities</a></li>
+                    <li><a href="#requirements-en">✅ Requirements</a></li>
+                    <li><a href="#team-en">👥 The Team</a></li>
+                    <li><a href="#benefits-en">🎁 Benefits</a></li>
+                </ul>
+            </nav>
+            
+            <div class="content">
+                <!-- INTRODUCTION -->
+                <div class="section" id="introduction-en">
+                    <h2>📖 Introduction to the Position</h2>
+                    
+                    <div class="highlight-box">
+                        <h3>Shape the Future of Energy Storage!</h3>
+                        <p style="font-size: 1.2em; margin-top: 15px;">As <strong>BESS Monitoring and Diagnostics Operations Lead</strong>, you will take on a key role in the energy transition. You will lead the monitoring and diagnostics team for Battery Energy Storage Systems (BESS) and ensure that these critical infrastructures operate reliably, efficiently, and optimally.</p>
+                    </div>
+                    
+                    <h3>🔋 What are BESS (Battery Energy Storage Systems)?</h3>
+                    <div class="info-box">
+                        <p><strong>Battery Energy Storage Systems are the backbone of the energy transition!</strong></p>
+                        <p style="margin-top: 15px;">BESS enable:</p>
+                        <ul>
+                            <li><strong>Integration of Renewable Energy</strong> - Storage of solar and wind power</li>
+                            <li><strong>Grid Stabilization</strong> - Peak shaving and frequency regulation</li>
+                            <li><strong>Energy Security</strong> - Backup power supply</li>
+                            <li><strong>Economic Efficiency</strong> - Optimization of energy costs</li>
+                        </ul>
+                    </div>
+                    
+                    <h3>🎯 Why is this position so important?</h3>
+                    <p>In this dynamic and forward-looking role, you are responsible for:</p>
+                    
+                    <div class="job-card">
+                        <h4>1. 📊 Operational Excellence</h4>
+                        <p>You monitor BESS assets in real-time across multiple sites, ensuring maximum availability and efficiency.</p>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>2. 🔍 Technical Leadership</h4>
+                        <p>You lead diagnostics, troubleshooting, and root cause analyses to minimize downtime and optimize system performance.</p>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>3. 🚀 Strategic Development</h4>
+                        <p>You develop the BESS Diagnostics Center (BDC) and implement forward-looking monitoring and maintenance strategies.</p>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>4. 👥 Team Leadership</h4>
+                        <p>You lead, mentor, and develop your team, setting an example with a "Customer First" mentality.</p>
+                    </div>
+                </div>
+                
+                <!-- THE POSITION -->
+                <div class="section" id="position-en">
+                    <h2>💼 A Snapshot of Your Day</h2>
+                    
+                    <div class="highlight-box">
+                        <h3>Your Impact on the Energy Transition</h3>
+                        <p style="font-size: 1.1em;">In this important and dynamic role as BESS Monitoring and Diagnostics Operations Lead, you will lead the further development of the Monitoring and Diagnostics operations team and set an example/role-model with a <strong>customer first attitude</strong>.</p>
+                    </div>
+                    
+                    <h3>🔄 Your Daily Responsibilities</h3>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Area</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Operational Monitoring</strong></td>
+                                <td>Real-time monitoring of BESS performance across multiple sites</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Technical Diagnostics</strong></td>
+                                <td>Fault diagnosis, troubleshooting, and root cause analysis</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Data Analysis</strong></td>
+                                <td>Performance data analysis and implementation of optimizations</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Predictive Maintenance</strong></td>
+                                <td>Development of predictive maintenance strategies using data analytics</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Collaboration</strong></td>
+                                <td>Cross-functional coordination with engineering, maintenance, and commissioning</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Team Development</strong></td>
+                                <td>Leadership, mentoring, and training of the team</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- RESPONSIBILITIES -->
+                <div class="section" id="responsibilities-en">
+                    <h2>🎯 How You'll Make an Impact</h2>
+                    
+                    <h3>Your Core Responsibilities</h3>
+                    
+                    <div class="job-card">
+                        <h4>📡 Real-time Monitoring &amp; Documentation</h4>
+                        <ul>
+                            <li>Real-time monitoring of BESS performance across multiple sites</li>
+                            <li>Ensuring continuous operation and maximum efficiency</li>
+                            <li>Comprehensive documentation of all operating parameters</li>
+                            <li>Early detection of anomalies and deviations</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>🔧 Diagnostics &amp; Troubleshooting</h4>
+                        <ul>
+                            <li>Leadership of diagnostics for BESS components (batteries, inverters, control systems)</li>
+                            <li>Conducting root cause analyses to minimize downtime</li>
+                            <li>Remote diagnostics and fault elimination</li>
+                            <li>Development of solution strategies for complex technical problems</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>📊 Performance Analysis &amp; Optimization</h4>
+                        <ul>
+                            <li>Analysis of performance data in line with industry standards and best practices</li>
+                            <li>Implementation of optimization measures</li>
+                            <li>Benchmarking and KPI tracking</li>
+                            <li>Continuous improvement of system performance</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>🤖 Predictive Maintenance</h4>
+                        <ul>
+                            <li>Development and implementation of predictive maintenance strategies</li>
+                            <li>Using data analytics and remote monitoring tools</li>
+                            <li>Application of AI/ML for prediction models</li>
+                            <li>Reduction of unplanned outages through proactive maintenance</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>🤝 Cross-functional Collaboration</h4>
+                        <ul>
+                            <li>Close collaboration with engineering teams</li>
+                            <li>Coordination with maintenance and commissioning teams</li>
+                            <li>Alignment of processes with project goals</li>
+                            <li>Interface to customers and stakeholders</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>👥 Leadership &amp; Team Development</h4>
+                        <ul>
+                            <li>Leadership and mentoring of monitoring and diagnostic teams</li>
+                            <li>Training in new monitoring, diagnostic, and control technologies</li>
+                            <li>Development of processes and procedures for the BDC</li>
+                            <li>Setting the foundation for team success</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- REQUIREMENTS -->
+                <div class="section" id="requirements-en">
+                    <h2>✅ What You Bring</h2>
+                    
+                    <h3>Formal Qualifications</h3>
+                    <div class="info-box">
+                        <ul class="checklist">
+                            <li><strong>University degree</strong> in Engineering, Power Systems, or related field</li>
+                            <li>Or <strong>equivalent combination</strong> of education and experience</li>
+                        </ul>
+                    </div>
+                    
+                    <h3>Professional Experience</h3>
+                    <div class="job-card">
+                        <h4>🏭 Operational &amp; Customer-Facing Experience</h4>
+                        <ul>
+                            <li><strong>Long-term relevant experience</strong> in energy infrastructure or power plants</li>
+                            <li><strong>Several years of experience</strong> in BESS operation, monitoring, and diagnostics</li>
+                            <li><strong>Customer contact</strong> - Experience in customer-oriented roles</li>
+                        </ul>
+                    </div>
+                    
+                    <h3>Technical Expertise</h3>
+                    <div class="job-card">
+                        <h4>🔋 BESS Technologies</h4>
+                        <p><strong>Strong knowledge of:</strong></p>
+                        <ul>
+                            <li><strong>Batteries</strong> - Lithium-ion, technologies, degradation</li>
+                            <li><strong>Power Conversion Systems</strong> - Inverters, rectifiers</li>
+                            <li><strong>Transformers</strong> - Medium and high voltage technology</li>
+                            <li><strong>Control Systems</strong> - SCADA, PLC, BMS</li>
+                            <li><strong>Monitoring Systems</strong> - Real-time monitoring, alarm systems</li>
+                            <li><strong>Digitalization</strong> - IoT, cloud platforms, data analytics</li>
+                            <li><strong>Energy Management Systems (EMS)</strong> - Optimization, control</li>
+                        </ul>
+                    </div>
+                    
+                    <h3>Leadership &amp; Soft Skills</h3>
+                    <div class="job-card">
+                        <h4>👨‍💼 Leadership Qualities</h4>
+                        <ul>
+                            <li><strong>Proven leadership experience</strong> with cross-functional teams</li>
+                            <li><strong>Strong collaboration skills</strong> across departments</li>
+                            <li><strong>Mentoring &amp; Coaching</strong> - Development of team members</li>
+                            <li><strong>Customer First mentality</strong> - Customer orientation as role model</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>🔍 Analytical Skills</h4>
+                        <ul>
+                            <li><strong>Advanced analytical skills</strong> - Data interpretation, pattern recognition</li>
+                            <li><strong>Troubleshooting expertise</strong> - Systematic fault finding</li>
+                            <li><strong>Remote diagnostics</strong> - Remote maintenance and analysis</li>
+                            <li><strong>Fault detection</strong> - Early detection of failures</li>
+                            <li><strong>Digital tools</strong> - Ticketing systems, monitoring software</li>
+                        </ul>
+                    </div>
+                    
+                    <h3>Additional Qualifications</h3>
+                    <div class="job-card">
+                        <h4>📋 Service &amp; Standards</h4>
+                        <ul>
+                            <li><strong>Service models</strong> - LTSAs (Long-Term Service Agreements)</li>
+                            <li><strong>Performance guarantees</strong> - Availability and performance guarantees</li>
+                            <li><strong>RAMS</strong> - Reliability, Availability, Maintainability, Safety</li>
+                            <li><strong>Standards &amp; Grid Codes</strong> - Relevant standards and grid connection requirements</li>
+                            <li><strong>Market requirements</strong> - Understanding of energy markets</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>💬 Communication &amp; Project Management</h4>
+                        <ul>
+                            <li><strong>Project management skills</strong> - Planning, controlling, monitoring</li>
+                            <li><strong>Strong communication skills</strong> in English (further European languages are an advantage)</li>
+                            <li><strong>Presentation skills</strong> - Communicating technical content clearly</li>
+                            <li><strong>Documentation</strong> - Technical reports and analyses</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- TEAM -->
+                <div class="section" id="team-en">
+                    <h2>👥 About the Team</h2>
+                    
+                    <div class="highlight-box">
+                        <h3>Grid Technologies Division</h3>
+                        <p style="font-size: 1.1em;">Our Grid Technology division enables a <strong>reliable, sustainable, and digital grid</strong>. The power grid is the backbone of the energy transition.</p>
+                    </div>
+                    
+                    <h3>🌍 Our Portfolio</h3>
+                    <div class="job-card">
+                        <p>Siemens Energy offers a leading portfolio and solutions in:</p>
+                        <ul>
+                            <li><strong>HVDC transmission</strong> - High Voltage Direct Current transmission</li>
+                            <li><strong>Grid stabilization &amp; storage</strong> - BESS, FACTS</li>
+                            <li><strong>High voltage switchgears</strong> - GIS, AIS</li>
+                            <li><strong>Transformers</strong> - Power transformers</li>
+                            <li><strong>Digital grid technology</strong> - Smart Grid Solutions</li>
+                        </ul>
+                    </div>
+                    
+                    <h3>⚡ Who is Siemens Energy?</h3>
+                    <div class="info-box">
+                        <p><strong>At Siemens Energy, we are more than just an energy technology company.</strong></p>
+                        <p style="margin-top: 15px;">With <strong>~100,000 dedicated employees</strong> in more than <strong>90 countries</strong>, we develop the energy systems of the future, ensuring that the growing energy demand of the global community is met reliably and sustainably.</p>
+                        <p style="margin-top: 15px;">The technologies created in our research departments and factories drive the energy transition and provide the base for <strong>one sixth of the world's electricity generation</strong>.</p>
+                    </div>
+                </div>
+                
+                <!-- BENEFITS -->
+                <div class="section" id="benefits-en">
+                    <h2>🎁 Rewards/Benefits</h2>
+                    
+                    <div class="success-box">
+                        <h3>What We Offer You</h3>
+                        <p>In addition to an attractive remuneration package in line with the market, you can expect:</p>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>💰 Compensation &amp; Pension</h4>
+                        <ul>
+                            <li>Attractive remuneration package in line with the market</li>
+                            <li>Employer-financed company pension scheme</li>
+                            <li>Opportunity to become a Siemens Energy shareholder</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>🏢 Flexible Work</h4>
+                        <ul>
+                            <li><strong>Hybrid model</strong> - Flexible and remote working</li>
+                            <li><strong>Remote options</strong> - Work from home</li>
+                            <li><strong>Inspiring offices</strong> - Space for collaboration and creativity</li>
+                            <li><strong>Locations</strong> - Erlangen, Mülheim an der Ruhr, Hamburg</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>📚 Development &amp; Training</h4>
+                        <ul>
+                            <li><strong>Professional development</strong> - Individual development plans</li>
+                            <li><strong>Self-determined learning</strong> - Various learning materials</li>
+                            <li><strong>Attractive programs</strong> - Training, certifications</li>
+                            <li><strong>Career paths</strong> - Clear development opportunities</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>👨‍👩‍👧‍👦 Work-Life Balance</h4>
+                        <ul>
+                            <li><strong>Flexible working time models</strong> - Adapted to your needs</li>
+                            <li><strong>Childcare</strong> - Available at many locations</li>
+                            <li><strong>Part-time options</strong> - Trial part-time possible</li>
+                            <li><strong>Sabbatical</strong> - Time off for personal projects</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="job-card">
+                        <h4>🌈 Diversity &amp; Inclusion</h4>
+                        <ul>
+                            <li><strong>Diversity</strong> - Over 130 nationalities</li>
+                            <li><strong>Equal opportunities</strong> - No discrimination</li>
+                            <li><strong>Inclusion</strong> - Applications from people with disabilities welcome</li>
+                            <li><strong>Character</strong> - We celebrate personality</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p><strong>© 2026 Siemens Energy Global GmbH &amp; Co. KG</strong></p>
+            <p>Grid Technologies | Service | BESS Diagnostics Center</p>
+            <p style="margin-top: 15px;">🌍 Making sustainable, reliable, and affordable energy a reality</p>
+            <p style="margin-top: 10px;">🔗 <a href="https://www.siemens-energy.com/employeevideo">Find out how you can make a difference at Siemens Energy</a></p>
+        </footer>
+    </div>
+    
+    <script>
+        function switchLang(lang) {
+            // Hide all content
+            document.querySelectorAll('.lang-content').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Remove active from all buttons
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected content
+            document.getElementById('content-' + lang).classList.add('active');
+            
+            // Activate button
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
