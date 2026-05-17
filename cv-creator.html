@@ -825,25 +825,19 @@ const EH={
       <div style="opacity:${show?1:.4};pointer-events:${show?'auto':'none'}">
         <div>${hobbies.map((h,i)=>{
           const en=typeof h==='string'?h:(h.en||'');
-          const de=typeof h==='string'?h:(h.de||'');
-          const es=typeof h==='string'?h:(h.es||'');
-          const fr=typeof h==='string'?h:(h.fr||'');
+          const cur=typeof h==='string'?h:(h[lang]||en||'');
           return `<div class="card">
             <div class="card-hdr">
-              <span class="card-ttl">${esc(h[lang]||en||'Hobby '+(i+1))}</span>
+              <span class="card-ttl">${esc(cur||'Hobby '+(i+1))}</span>
               <div style="display:flex;gap:3px;align-items:center">
                 <button class="delbtn" style="background:#e8f0f8;color:var(--p);font-size:.8em" ${i===0?'disabled':''} onclick="moveEntry(D.hobbies,${i},-1)">▲</button>
                 <button class="delbtn" style="background:#e8f0f8;color:var(--p);font-size:.8em" ${i===n-1?'disabled':''} onclick="moveEntry(D.hobbies,${i},1)">▼</button>
                 <button class="delbtn" onclick="D.hobbies.splice(${i},1);renderEditor();renderCV()">×</button>
               </div>
             </div>
-            <div class="g2">
-              <div class="fg" style="margin:0"><label>EN</label><input value="${esc(en)}" oninput="setHobbyLang(${i},'en',this.value)"></div>
-              <div class="fg" style="margin:0"><label>DE</label><input value="${esc(de)}" oninput="setHobbyLang(${i},'de',this.value)"></div>
-            </div>
-            <div class="g2" style="margin-top:8px">
-              <div class="fg" style="margin:0"><label>ES</label><input value="${esc(es)}" oninput="setHobbyLang(${i},'es',this.value)"></div>
-              <div class="fg" style="margin:0"><label>FR</label><input value="${esc(fr)}" oninput="setHobbyLang(${i},'fr',this.value)"></div>
+            <div class="fg" style="margin:0">
+              <label>${lang.toUpperCase()}</label>
+              <input value="${esc(cur)}" oninput="setHobbyLang(${i},'${lang}',this.value)">
             </div>
           </div>`;}).join('')}</div>
         <button class="addbtn" onclick="addHobby()">+ Hobby hinzufügen</button>
