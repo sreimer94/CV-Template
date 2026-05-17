@@ -455,6 +455,11 @@ function setLangColor(i,val){
   const hex=document.getElementById('hex-lang'+i);
   if(hex) hex.textContent=val;
 }
+function setAllLangColors(val){
+  COLORS.langs=D.languages.map(()=>val);
+  applyColors();
+  if(tab==='colors') renderEditor();
+}
 function applyTheme(name){
   const prevLangs=COLORS.langs?[...COLORS.langs]:null;
   COLORS={...THEMES[name]};
@@ -796,6 +801,11 @@ EH.colors=function(){
     </div>
     <div class="color-section">
       <div class="color-section-title">Language Bar Colors</div>
+      <div class="color-row" style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)">
+        <label style="font-weight:700">Alle gleich</label>
+        <input type="color" value="${(COLORS.langs&&COLORS.langs[0])||'#00b4a0'}" oninput="setAllLangColors(this.value)">
+        <span class="color-hex"></span>
+      </div>
       <div class="lang-color-grid">${langRows}</div>
     </div>
     <button class="reset-btn" onclick="applyTheme('se');renderEditor()">↺ Reset to Siemens Energy</button>`;
