@@ -53,8 +53,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#1a2332;color:var(--
 .esec.active{display:block;}
 .fg{margin-bottom:12px;}
 .fg label{display:block;font-size:.7em;font-weight:700;color:#5a6a7a;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
-.fg input,.fg textarea{width:100%;padding:7px 9px;border:1px solid var(--border);border-radius:5px;font-size:.85em;background:white;color:var(--dark);transition:border .2s;font-family:inherit;}
-.fg input:focus,.fg textarea:focus{outline:none;border-color:var(--p);}
+.fg input,.fg select,.fg textarea{width:100%;padding:7px 9px;border:1px solid var(--border);border-radius:5px;font-size:.85em;background:white;color:var(--dark);transition:border .2s;font-family:inherit;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--p);}
+.fg select{appearance:auto;cursor:pointer;}
 .fg textarea{resize:vertical;min-height:70px;}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .sdiv{font-size:.68em;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:1px;margin:14px 0 8px;border-bottom:1px solid var(--border);padding-bottom:3px;}
@@ -670,7 +671,7 @@ const EH={
         </div>
         <div class="g2">
           <div class="fg" style="margin:0"><label>Language</label><input value="${esc(l.name)}" oninput="D.languages[${i}].name=this.value;renderCV()"></div>
-          <div class="fg" style="margin:0"><label>Level</label><select style="width:100%;padding:7px 9px;border:1px solid var(--border);border-radius:5px;font-size:.85em;background:white;color:var(--dark)" onchange="D.languages[${i}].level=this.value;renderCV()">${opts}</select></div>
+          <div class="fg" style="margin:0"><label>Level</label><select onchange="D.languages[${i}].level=this.value;renderCV()">${opts}</select></div>
         </div>
       </div>`;}).join('')}</div>
       <button class="addbtn" onclick="D.languages.push({name:'New Language',level:'B1'});renderEditor();renderCV()">+ Add Language</button>`;
