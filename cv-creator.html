@@ -88,8 +88,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#1a2332;color:var(--
 
 /* Header */
 .cv-hdr{display:flex;align-items:center;padding:14px 22px 12px;gap:14px;font-size:calc(16px * var(--fs-hdr));background:white;border-bottom:2px solid var(--dark);}
-.cv-photo{width:74px;height:74px;border-radius:50%;border:3px solid var(--p);object-fit:cover;flex-shrink:0;}
-.cv-photo-ph{width:74px;height:74px;border-radius:50%;border:3px solid var(--p);background:#e8edf4;display:flex;align-items:center;justify-content:center;font-size:1.7em;flex-shrink:0;}
+.cv-photo{border-radius:50%;border:3px solid var(--p);object-fit:cover;flex-shrink:0;}
+.cv-photo-ph{border-radius:50%;border:3px solid var(--p);background:#e8edf4;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .cv-hdr-mid{flex:1;padding-left:2px;font-size:calc(1em * var(--fs-hdr-name));}
 .cv-hdr-name{font-size:1.7em;font-weight:700;color:#0f1923;line-height:1.1;}
 .cv-hdr-title{font-size:.6em;font-weight:700;color:var(--p);letter-spacing:3px;text-transform:uppercase;margin-top:4px;}
@@ -495,9 +495,13 @@ const ICONS={
 function renderCV(){
   const d=D, tr=TR[lang];
 
+  const psz=d.personal.photoSize||74;
+  const ppx=d.personal.photoX!=null?d.personal.photoX:50;
+  const ppy=d.personal.photoY!=null?d.personal.photoY:50;
+  const pDim=`width:${psz}px;height:${psz}px`;
   const photo=d.personal.photo
-    ?`<img class="cv-photo" src="${esc(d.personal.photo)}" alt="" onerror="this.style.display='none';this.nextSibling.style.display='flex'">`:'';
-  const photoPh=`<div class="cv-photo-ph" ${d.personal.photo?'style="display:none"':''}>👤</div>`;
+    ?`<img class="cv-photo" style="${pDim};object-position:${ppx}% ${ppy}%" src="${esc(d.personal.photo)}" alt="" onerror="this.style.display='none';this.nextSibling.style.display='flex'">`:'';
+  const photoPh=`<div class="cv-photo-ph" style="${pDim};font-size:${(psz/74*1.7).toFixed(2)}em${d.personal.photo?';display:none':''}">👤</div>`;
 
   const ci=(icon,val,href)=>val
     ?(href?`<a href="${href}" target="_blank" rel="noopener" class="cv-ci"><i>${icon}</i>${esc(val)}</a>`
@@ -641,6 +645,25 @@ const EH={
         ${p.photo?`<img src="${esc(p.photo)}" onerror="this.style.display='none';this.nextSibling.style.display='block'"><span class="ph-txt" style="display:none">📷 Click</span>`:'<span class="ph-txt">📷<br>Click to add</span>'}
       </div>
       <input type="file" id="phIn" accept="image/*" style="display:none" onchange="uploadPhoto(event)">
+      <div class="sdiv">Foto</div>
+      <div class="slider-row">
+        <label>Größe</label>
+        <input type="range" min="40" max="120" step="2" value="${p.photoSize||74}"
+          oninput="D.personal.photoSize=+this.value;document.getElementById('slv-psz').textContent=this.value+'px';renderCV()">
+        <span class="slider-val" id="slv-psz">${p.photoSize||74}px</span>
+      </div>
+      <div class="slider-row">
+        <label>Position X</label>
+        <input type="range" min="0" max="100" step="5" value="${p.photoX!=null?p.photoX:50}"
+          oninput="D.personal.photoX=+this.value;document.getElementById('slv-px').textContent=this.value+'%';renderCV()">
+        <span class="slider-val" id="slv-px">${p.photoX!=null?p.photoX:50}%</span>
+      </div>
+      <div class="slider-row">
+        <label>Position Y</label>
+        <input type="range" min="0" max="100" step="5" value="${p.photoY!=null?p.photoY:50}"
+          oninput="D.personal.photoY=+this.value;document.getElementById('slv-py').textContent=this.value+'%';renderCV()">
+        <span class="slider-val" id="slv-py">${p.photoY!=null?p.photoY:50}%</span>
+      </div>
       <div class="fg"><label>Full Name</label><input value="${esc(p.name)}" oninput="D.personal.name=this.value;renderCV()"></div>
       <div class="fg"><label>Job Title</label><input value="${esc(p.title)}" oninput="D.personal.title=this.value;renderCV()"></div>
       <div class="fg"><label>Location (header display)</label><input value="${esc(p.location)}" oninput="D.personal.location=this.value;renderCV()"></div>
