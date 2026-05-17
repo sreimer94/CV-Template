@@ -460,7 +460,8 @@ const LANG_COLORS=COLORS.langs; // kept for reference; renderCV uses COLORS.lang
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function moveLang(i,dir){const j=i+dir;if(j<0||j>=D.languages.length)return;[D.languages[i],D.languages[j]]=[D.languages[j],D.languages[i]];renderEditor();renderCV();}
-function lvlPct(l){return({'Native':100,'C2':95,'C1':80,'B2':70,'B1':55,'A2':35,'A1':20})[l]||50;}
+function lvlPct(l){return({'Native':100,'NATIVE':100,'Muttersprache':100,'MUTTERSPRACHE':100,'Nativo':100,'NATIVO':100,'Langue Maternelle':100,'Langue maternelle':100,'LANGUE MATERNELLE':100,'C2':95,'C1':80,'B2':70,'B1':55,'A2':35,'A1':20})[l]||50;}
+function isNativeLvl(l){return lvlPct(l)===100;}
 function fmtD(s){
   if(!s) return '';
   return s.replace(/^(\w{3})\s+(\d{4})$/,(_,m,y)=>m.toUpperCase()+'.'+y);
@@ -519,7 +520,7 @@ function renderCV(){
     <div class="cv-lang-item">
       <div class="cv-lang-row">
         <span class="cv-lang-name">${esc(l.name)}</span>
-        <span class="cv-lang-lvl" style="color:${lc}">${l.level==='Native'?tr.native:esc(l.level)}</span>
+        <span class="cv-lang-lvl" style="color:${lc}">${isNativeLvl(l.level)?tr.native:esc(l.level)}</span>
       </div>
       <div class="cv-lang-bar">
         <div class="cv-lang-fill" style="width:${lvlPct(l.level)}%;background:${lc}"></div>
@@ -652,9 +653,10 @@ const EH={
   },
   languages(){
     const levels=['Native','C2','C1','B2','B1','A2','A1'];
+    const nativeLbl=TR[lang].native.charAt(0)+TR[lang].native.slice(1).toLowerCase();
     return `<div>${D.languages.map((l,i)=>{
-      const lvl=l.level||'B1';
-      const opts=[...new Set([lvl,...levels])].map(v=>`<option value="${esc(v)}" ${v===lvl?'selected':''}>${esc(v)}</option>`).join('');
+      const lvl=isNativeLvl(l.level)?'Native':(l.level||'B1');
+      const opts=[...new Set([lvl,...levels])].map(v=>`<option value="${esc(v)}" ${v===lvl?'selected':''}>${v==='Native'?esc(nativeLbl):esc(v)}</option>`).join('');
       const last=i===D.languages.length-1;
       return `
       <div class="card">
