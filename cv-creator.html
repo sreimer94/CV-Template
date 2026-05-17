@@ -475,6 +475,24 @@ const LANG_COLORS=COLORS.langs; // kept for reference; renderCV uses COLORS.lang
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function moveLang(i,dir){const j=i+dir;if(j<0||j>=D.languages.length)return;[D.languages[i],D.languages[j]]=[D.languages[j],D.languages[i]];renderEditor();renderCV();}
+function moveEntry(arr,i,dir){const j=i+dir;if(j<0||j>=arr.length)return;[arr[i],arr[j]]=[arr[j],arr[i]];renderEditor();renderCV();}
+function parseDateStr(s){
+  if(!s)return 0;
+  const mo={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+  const p=s.trim().toLowerCase().split(/[\s./\-]+/);
+  const yr=parseInt(p.find(x=>/^\d{4}$/.test(x)))||0;
+  const mn=mo[p.find(x=>mo[x]!==undefined)]??0;
+  return yr*12+mn;
+}
+function sortByDate(arr,newestFirst=true){
+  arr.sort((a,b)=>{
+    if(a.current&&!b.current)return -1;
+    if(!a.current&&b.current)return 1;
+    const d=parseDateStr(b.start)-parseDateStr(a.start);
+    return newestFirst?d:-d;
+  });
+  renderEditor();renderCV();
+}
 function lvlPct(l){return({'Native':100,'NATIVE':100,'Muttersprache':100,'MUTTERSPRACHE':100,'Nativo':100,'NATIVO':100,'Langue Maternelle':100,'Langue maternelle':100,'LANGUE MATERNELLE':100,'C2':95,'C1':80,'B2':70,'B1':55,'A2':35,'A1':20})[l]||50;}
 function isNativeLvl(l){return lvlPct(l)===100;}
 function fmtD(s){
@@ -758,9 +776,19 @@ const EH={
       </div>`;
   },
   experience(){
-    return `<div>${D.experience.map((e,i)=>`
+    const n=D.experience.length;
+    return `
+      <button class="addbtn" style="margin-bottom:8px" onclick="sortByDate(D.experience,true)">⇅ Nach Datum sortieren</button>
+      <div>${D.experience.map((e,i)=>`
       <div class="card">
-        <div class="card-hdr"><span class="card-ttl">${esc(e.title||'Position '+(i+1))}</span><button class="delbtn" onclick="D.experience.splice(${i},1);renderEditor();renderCV()">×</button></div>
+        <div class="card-hdr">
+          <span class="card-ttl">${esc(e.title||'Position '+(i+1))}</span>
+          <div style="display:flex;gap:3px;align-items:center">
+            <button class="delbtn" style="background:#e8f0f8;color:var(--p);font-size:.8em" ${i===0?'disabled':''} onclick="moveEntry(D.experience,${i},-1)">▲</button>
+            <button class="delbtn" style="background:#e8f0f8;color:var(--p);font-size:.8em" ${i===n-1?'disabled':''} onclick="moveEntry(D.experience,${i},1)">▼</button>
+            <button class="delbtn" onclick="D.experience.splice(${i},1);renderEditor();renderCV()">×</button>
+          </div>
+        </div>
         <div class="g2">
           <div class="fg" style="margin:0"><label>Start</label><input value="${esc(e.start)}" placeholder="Jul 2025" oninput="D.experience[${i}].start=this.value;renderCV()"></div>
           <div class="fg" style="margin:0"><label>End</label><input value="${esc(e.end)}" placeholder="Jun 2026" oninput="D.experience[${i}].end=this.value;renderCV()"></div>
@@ -773,9 +801,19 @@ const EH={
       <button class="addbtn" onclick="D.experience.unshift({id:Date.now(),start:'',end:'',current:false,title:'New Position',subtitle:'',company:'',bullets:[]});renderEditor();renderCV()">+ Add Position</button>`;
   },
   education(){
-    return `<div>${D.education.map((e,i)=>`
+    const n=D.education.length;
+    return `
+      <button class="addbtn" style="margin-bottom:8px" onclick="sortByDate(D.education,true)">⇅ Nach Datum sortieren</button>
+      <div>${D.education.map((e,i)=>`
       <div class="card">
-        <div class="card-hdr"><span class="card-ttl">${esc(e.degree||'Education '+(i+1))}</span><button class="delbtn" onclick="D.education.splice(${i},1);renderEditor();renderCV()">×</button></div>
+        <div class="card-hdr">
+          <span class="card-ttl">${esc(e.degree||'Education '+(i+1))}</span>
+          <div style="display:flex;gap:3px;align-items:center">
+            <button class="delbtn" style="background:#e8f0f8;color:var(--p);font-size:.8em" ${i===0?'disabled':''} onclick="moveEntry(D.education,${i},-1)">▲</button>
+            <button class="delbtn" style="background:#e8f0f8;color:var(--p);font-size:.8em" ${i===n-1?'disabled':''} onclick="moveEntry(D.education,${i},1)">▼</button>
+            <button class="delbtn" onclick="D.education.splice(${i},1);renderEditor();renderCV()">×</button>
+          </div>
+        </div>
         <div class="g2">
           <div class="fg" style="margin:0"><label>Start</label><input value="${esc(e.start)}" oninput="D.education[${i}].start=this.value;renderCV()"></div>
           <div class="fg" style="margin:0"><label>End</label><input value="${esc(e.end)}" oninput="D.education[${i}].end=this.value;renderCV()"></div>
