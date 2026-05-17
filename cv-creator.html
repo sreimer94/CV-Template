@@ -459,6 +459,7 @@ function applyTheme(name){
 const LANG_COLORS=COLORS.langs; // kept for reference; renderCV uses COLORS.langs directly
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function moveLang(i,dir){const j=i+dir;if(j<0||j>=D.languages.length)return;[D.languages[i],D.languages[j]]=[D.languages[j],D.languages[i]];renderEditor();renderCV();}
 function lvlPct(l){return({'Native':100,'C2':95,'C1':80,'B2':70,'B1':55,'A2':35,'A1':20})[l]||50;}
 function fmtD(s){
   if(!s) return '';
@@ -587,10 +588,10 @@ function renderCV(){
           <div class="cv-sh">${tr.languages}</div>
           ${langs}
         </div>
-        <div class="cv-mod" style="font-size:calc(1em*var(--fs-certs))">
+        ${d.showCerts!==false?`<div class="cv-mod" style="font-size:calc(1em*var(--fs-certs))">
           <div class="cv-sh">${tr.certificates}</div>
           ${certs}
-        </div>
+        </div>`:''}
       </div>
       <div class="cv-right">
         <div class="cv-mod" style="font-size:calc(1em*var(--fs-exp))">
@@ -650,25 +651,45 @@ const EH={
       </div>`).join('');
   },
   languages(){
-    return `<div>${D.languages.map((l,i)=>`
+    const levels=['Native','C2','C1','B2','B1','A2','A1'];
+    return `<div>${D.languages.map((l,i)=>{
+      const lvl=l.level||'B1';
+      const opts=[...new Set([lvl,...levels])].map(v=>`<option value="${esc(v)}" ${v===lvl?'selected':''}>${esc(v)}</option>`).join('');
+      const last=i===D.languages.length-1;
+      return `
       <div class="card">
-        <div class="card-hdr"><span class="card-ttl">${esc(l.name)}</span><button class="delbtn" onclick="D.languages.splice(${i},1);renderEditor();renderCV()">×</button></div>
+        <div class="card-hdr">
+          <span class="card-ttl">${esc(l.name)}</span>
+          <div style="display:flex;gap:3px;align-items:center">
+            <button class="delbtn" style="background:#e8f0f8;color:var(--p);font-size:.8em" ${i===0?'disabled':''} onclick="moveLang(${i},-1)">▲</button>
+            <button class="delbtn" style="background:#e8f0f8;color:var(--p);font-size:.8em" ${last?'disabled':''} onclick="moveLang(${i},1)">▼</button>
+            <button class="delbtn" onclick="D.languages.splice(${i},1);renderEditor();renderCV()">×</button>
+          </div>
+        </div>
         <div class="g2">
           <div class="fg" style="margin:0"><label>Language</label><input value="${esc(l.name)}" oninput="D.languages[${i}].name=this.value;renderCV()"></div>
-          <div class="fg" style="margin:0"><label>Level</label><input value="${esc(l.level)}" placeholder="C2 / Native" oninput="D.languages[${i}].level=this.value;renderCV()"></div>
+          <div class="fg" style="margin:0"><label>Level</label><select style="width:100%;padding:7px 9px;border:1px solid var(--border);border-radius:5px;font-size:.85em;background:white;color:var(--dark)" onchange="D.languages[${i}].level=this.value;renderCV()">${opts}</select></div>
         </div>
-      </div>`).join('')}</div>
+      </div>`;}).join('')}</div>
       <button class="addbtn" onclick="D.languages.push({name:'New Language',level:'B1'});renderEditor();renderCV()">+ Add Language</button>`;
   },
   certificates(){
-    return `<div>${D.certificates.map((c,i)=>`
-      <div class="card">
-        <div class="card-hdr"><span class="card-ttl">${esc(c.title)}</span><button class="delbtn" onclick="D.certificates.splice(${i},1);renderEditor();renderCV()">×</button></div>
-        <div class="fg"><label>Title</label><input value="${esc(c.title)}" oninput="D.certificates[${i}].title=this.value;renderCV()"></div>
-        <div class="fg"><label>Issuer</label><input value="${esc(c.issuer)}" oninput="D.certificates[${i}].issuer=this.value;renderCV()"></div>
-        <div class="fg"><label>Date</label><input value="${esc(c.date)}" oninput="D.certificates[${i}].date=this.value;renderCV()"></div>
-      </div>`).join('')}</div>
-      <button class="addbtn" onclick="D.certificates.push({title:'New Certificate',issuer:'Issuer',date:'2025'});renderEditor();renderCV()">+ Add Certificate</button>`;
+    const show=D.showCerts!==false;
+    return `
+      <label class="chk-row" style="margin-bottom:10px;font-weight:700">
+        <input type="checkbox" ${show?'checked':''} onchange="D.showCerts=this.checked;renderEditor();renderCV()">
+        Zertifikate im CV anzeigen
+      </label>
+      <div style="opacity:${show?1:.4};pointer-events:${show?'auto':'none'}">
+        <div>${D.certificates.map((c,i)=>`
+          <div class="card">
+            <div class="card-hdr"><span class="card-ttl">${esc(c.title)}</span><button class="delbtn" onclick="D.certificates.splice(${i},1);renderEditor();renderCV()">×</button></div>
+            <div class="fg"><label>Title</label><input value="${esc(c.title)}" oninput="D.certificates[${i}].title=this.value;renderCV()"></div>
+            <div class="fg"><label>Issuer</label><input value="${esc(c.issuer)}" oninput="D.certificates[${i}].issuer=this.value;renderCV()"></div>
+            <div class="fg"><label>Date</label><input value="${esc(c.date)}" oninput="D.certificates[${i}].date=this.value;renderCV()"></div>
+          </div>`).join('')}</div>
+        <button class="addbtn" onclick="D.certificates.push({title:'New Certificate',issuer:'Issuer',date:'2025'});renderEditor();renderCV()">+ Add Certificate</button>
+      </div>`;
   },
   profile(){
     const isItalic=D.profileItalic!==false;
