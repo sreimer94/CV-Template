@@ -1,0 +1,207 @@
+{
+  "version": 2,
+  "exportedAt": "2026-05-17T00:00:00.000Z",
+  "language": "de",
+  "cv": {
+    "personal": {
+      "name": "Max Mustermann",
+      "title": "Projektmanager \u00b7 Digitalisierung",
+      "location": "M\u00fcnchen \u2194 Z\u00fcrich, CH",
+      "email": "max.mustermann@example.com",
+      "phone": "+49 170 1234567",
+      "base": "M\u00fcnchen / Z\u00fcrich \u00b7 CH",
+      "linkedin": "max-mustermann-123456789",
+      "linkedinUrl": "https://www.linkedin.com/in/max-mustermann-123456789/",
+      "github": "maxmustermann",
+      "githubUrl": "https://github.com/maxmustermann",
+      "photo": "",
+      "photoSize": 74,
+      "photoX": 50,
+      "photoY": 50
+    },
+    "skills": {
+      "technical": [
+        "Python",
+        "SQL",
+        "REST APIs",
+        "Power BI",
+        "Excel"
+      ],
+      "tools": [
+        "Jira",
+        "Confluence",
+        "VS Code",
+        "Git",
+        "Microsoft 365"
+      ],
+      "domain": [
+        "Digitalisierung",
+        "Prozessautomatisierung",
+        "Stakeholder Management",
+        "Reporting"
+      ],
+      "soft": [
+        "Analytisch",
+        "Strukturiert",
+        "Kommunikationsstark",
+        "L\u00f6sungsorientiert"
+      ]
+    },
+    "languages": [
+      {
+        "name": "Deutsch",
+        "level": "Native"
+      },
+      {
+        "name": "Englisch",
+        "level": "C1"
+      },
+      {
+        "name": "Franz\u00f6sisch",
+        "level": "B1"
+      },
+      {
+        "name": "Spanisch",
+        "level": "A2"
+      }
+    ],
+    "certificates": [
+      {
+        "title": "Professional Scrum Master I",
+        "issuer": "Scrum.org",
+        "date": "2025"
+      },
+      {
+        "title": "Google Project Management Certificate",
+        "issuer": "Coursera",
+        "date": "2024"
+      },
+      {
+        "title": "Microsoft Power BI Data Analyst",
+        "issuer": "Microsoft",
+        "date": "2023"
+      }
+    ],
+    "showCerts": true,
+    "profile": "Projektmanager mit starkem Fokus auf Digitalisierung, Prozessverbesserung und datenbasierte Entscheidungen.\n\nIch verbinde technische Umsetzungsst\u00e4rke mit klarer Kommunikation zwischen Fachbereich, IT und Management. Mein Schwerpunkt liegt auf pragmatischen L\u00f6sungen, die Teams schneller, transparenter und messbarer arbeiten lassen.",
+    "profileMode": "multi",
+    "profileItalic": true,
+    "experience": [
+      {
+        "id": 1,
+        "start": "Jan 2025",
+        "end": "",
+        "current": true,
+        "title": "Digital Project Manager",
+        "subtitle": "Current",
+        "company": "MusterTech AG \u00b7 Z\u00fcrich, Schweiz",
+        "bullets": [
+          "Leitung von Digitalisierungsprojekten f\u00fcr interne Fachbereiche",
+          "Aufbau von KPI-Dashboards f\u00fcr Management-Reporting",
+          "Koordination zwischen Business, IT und externen Dienstleistern",
+          "Optimierung von Prozessen durch Automatisierung und Standardisierung"
+        ]
+      },
+      {
+        "id": 2,
+        "start": "Mar 2022",
+        "end": "Dec 2024",
+        "current": false,
+        "title": "Business Analyst",
+        "subtitle": "",
+        "company": "Beispiel Consulting GmbH \u00b7 M\u00fcnchen, Deutschland",
+        "bullets": [
+          "Analyse und Dokumentation von Gesch\u00e4ftsprozessen",
+          "Erstellung von Anforderungen f\u00fcr Software- und Reporting-L\u00f6sungen",
+          "Moderation von Workshops mit Stakeholdern",
+          "Unterst\u00fctzung bei Rollouts und Change-Kommunikation"
+        ]
+      },
+      {
+        "id": 3,
+        "start": "Aug 2019",
+        "end": "Feb 2022",
+        "current": false,
+        "title": "Junior Project Coordinator",
+        "subtitle": "",
+        "company": "Demo Solutions GmbH \u00b7 Stuttgart, Deutschland",
+        "bullets": [
+          "Planung und Nachverfolgung von Projektmeilensteinen",
+          "Pflege von Projektpl\u00e4nen, Statusberichten und Risiko\u00fcbersichten",
+          "Unterst\u00fctzung der Projektleitung im Tagesgesch\u00e4ft"
+        ]
+      }
+    ],
+    "education": [
+      {
+        "id": 1,
+        "start": "Oct 2016",
+        "end": "Jul 2019",
+        "degree": "Bachelor of Science \u2014 Wirtschaftsinformatik",
+        "school": "Hochschule M\u00fcnchen"
+      },
+      {
+        "id": 2,
+        "start": "Sep 2013",
+        "end": "Jul 2016",
+        "degree": "Abitur",
+        "school": "Max-Planck-Gymnasium M\u00fcnchen"
+      }
+    ],
+    "hobbies": [
+      {
+        "en": "Running",
+        "de": "Laufen",
+        "es": "Correr",
+        "fr": "Course \u00e0 pied"
+      },
+      {
+        "en": "Photography",
+        "de": "Fotografie",
+        "es": "Fotograf\u00eda",
+        "fr": "Photographie"
+      },
+      {
+        "en": "Smart Home",
+        "de": "Smart Home",
+        "es": "Casa inteligente",
+        "fr": "Maison connect\u00e9e"
+      }
+    ],
+    "showHobbies": true
+  },
+  "layout": {
+    "sidebarWidth": 219,
+    "fsHeader": 100,
+    "fsHdrName": 100,
+    "fsHdrContact": 100,
+    "fsProfile": 100,
+    "fsLeft": 100,
+    "fsRight": 100,
+    "fsSkills": 100,
+    "fsLangs": 100,
+    "fsCerts": 100,
+    "fsExp": 100,
+    "fsEdu": 100,
+    "spacingR": 100,
+    "spacingL": 100
+  },
+  "colors": {
+    "name": "SE",
+    "primary": "#6929c4",
+    "accent": "#a352cc",
+    "dark": "#1d1741",
+    "mid": "#4a3870",
+    "light": "#8870a8",
+    "bg": "#f4f1f9",
+    "border": "#d0c8e8",
+    "card": "#ebe6f5",
+    "edu": "#10b981",
+    "langs": [
+      "#1d1741",
+      "#6929c4",
+      "#c47f00",
+      "#8870a8"
+    ]
+  }
+}

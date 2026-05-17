@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CV Creator — Simon Reimer</title>
+<title>CV Creator</title>
 <style>
 :root { --p:#00b4a0; --pd:#007a6e; --dark:#1e2a3a; --mid:#5a6a7a; --light:#8090a0; --border:#d8e3ec; --bg:#f4f7fa; --orange:#e8920a; --edu:#10b981; --sidebar-w:238px; --fs-hdr:1; --fs-hdr-name:1; --fs-hdr-contact:1; --fs-profile:1; --fs-left:1; --fs-right:1; --fs-skills:1; --fs-langs:1; --fs-certs:1; --fs-exp:1; --fs-edu:1; --spacing-r:1; --spacing-l:1; }
 /* COLOR EDITOR */
@@ -37,6 +37,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#1a2332;color:var(--
 .tbtn:hover{background:#344a60;}
 .tbtn.pri{background:var(--p);}
 .tbtn.pri:hover{background:var(--pd);}
+.tbtn:disabled{opacity:.42;cursor:not-allowed;}
+.tbtn.ghost{background:transparent;border:1px solid #344a60;color:#a9bac8;}
+.tbtn.danger{background:#3b1f28;color:#ffb4c0;}
+.tb-check{display:flex;align-items:center;gap:5px;color:#a9bac8;font-size:.78em;white-space:nowrap;cursor:pointer;}
+.tb-check input{accent-color:var(--p);}
 
 /* LAYOUT */
 #main{display:flex;flex:1;overflow:hidden;position:relative;}
@@ -166,6 +171,9 @@ a.cv-ci:hover{opacity:.8;text-decoration:underline;}
 .ithdr h3{font-size:1em;color:var(--dark);margin-bottom:4px;}
 .ithdr p{font-size:.78em;color:var(--mid);}
 .itbody{flex:1;overflow-y:auto;padding:16px 22px;display:flex;flex-direction:column;gap:12px;}
+.ittools{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;}
+.ittools select{width:100%;padding:7px 9px;border:1px solid var(--border);border-radius:6px;background:white;color:var(--dark);font-size:.82em;}
+.it-mini{background:#eef3ff;color:var(--mid);border:1px solid #c8d8f0;padding:7px 11px;border-radius:6px;cursor:pointer;font-size:.8em;font-weight:700;white-space:nowrap;}
 #it-ta{width:100%;height:260px;padding:10px;border:1px solid var(--border);border-radius:7px;font-size:.8em;font-family:monospace;resize:vertical;color:var(--dark);}
 #it-ta:focus{outline:none;border-color:var(--p);}
 #it-pv{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:12px;font-size:.75em;display:none;}
@@ -182,6 +190,8 @@ a.cv-ci:hover{opacity:.8;text-decoration:underline;}
 /* TOAST */
 #toast{position:fixed;bottom:20px;right:20px;background:#1d1741;color:white;padding:9px 16px;border-radius:7px;font-size:.82em;font-weight:600;z-index:9999;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;}
 #toast.show{opacity:1;transform:translateY(0);}
+#fitwarn{position:fixed;right:20px;bottom:64px;background:#f59e0b;color:#1f2937;padding:8px 13px;border-radius:7px;font-size:.78em;font-weight:700;z-index:9998;display:none;box-shadow:0 8px 24px rgba(0,0,0,.25);}
+#fitwarn.show{display:block;}
 /* DRAG & DROP */
 #pp.drag-over{outline:3px dashed var(--p);outline-offset:-6px;}
 #pp.drag-over::after{content:'JSON ablegen';position:absolute;inset:0;background:rgba(0,180,160,.18);display:flex;align-items:center;justify-content:center;font-size:1.4em;font-weight:700;color:var(--p);pointer-events:none;}
@@ -197,7 +207,7 @@ a.cv-ci:hover{opacity:.8;text-decoration:underline;}
 @media print{
   *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;}
   body{background:white !important;overflow:visible !important;height:auto !important;margin:0 !important;padding:0 !important;}
-  #tb,#ep,#etoggle,#itmodal,#toast{display:none !important;}
+  #tb,#ep,#etoggle,#itmodal,#toast,#fitwarn{display:none !important;}
   #main{height:auto !important;overflow:visible !important;display:block !important;}
   #pp{background:white !important;padding:0 !important;margin:0 !important;height:auto !important;overflow:visible !important;display:block !important;}
   #cv-outer{position:static !important;width:794px !important;height:1123px !important;display:block !important;}
@@ -223,26 +233,32 @@ a.cv-ci:hover{opacity:.8;text-decoration:underline;}
   </div>
   <div class="tsep"></div>
   <input type="file" id="jsonIn" accept=".json" style="display:none" onchange="importJSON(event)">
-  <button class="tbtn" onclick="saveData()" title="Save to browser (persists across sessions)">💾 Save</button>
-  <button class="tbtn" onclick="openIT()">📋 Import Text</button>
-  <button class="tbtn" onclick="document.getElementById('jsonIn').click()">↑ Import JSON</button>
-  <button class="tbtn" onclick="exportJSON()">↓ Export JSON</button>
-  <button class="tbtn pri" onclick="window.print()">📄 Create PDF</button>
+  <label class="tb-check" title="Automatically saves changes to this browser">
+    <input type="checkbox" id="autoSave" checked onchange="setAutoSave(this.checked)"> Auto-save
+  </label>
+  <button class="tbtn ghost" id="undoBtn" data-ui="undo" onclick="undoChange()" disabled>↶ Undo</button>
+  <button class="tbtn ghost" id="redoBtn" data-ui="redo" onclick="redoChange()" disabled>↷ Redo</button>
+  <button class="tbtn" data-ui="save" onclick="saveData()" title="Save to browser (persists across sessions)">💾 Save</button>
+  <button class="tbtn" data-ui="importText" onclick="openIT()">📋 Import Text</button>
+  <button class="tbtn" data-ui="importJson" onclick="document.getElementById('jsonIn').click()">↑ Import JSON</button>
+  <button class="tbtn" data-ui="exportJson" onclick="exportJSON()">↓ Export JSON</button>
+  <button class="tbtn danger" data-ui="reset" onclick="resetToDefault()">Reset</button>
+  <button class="tbtn pri" data-ui="pdf" onclick="window.print()">📄 Create PDF</button>
 </div>
 
 <div id="main">
   <div id="ep">
     <div class="etabs">
-      <button class="etab active" data-tab="personal" onclick="switchTab('personal')">Personal</button>
-      <button class="etab" data-tab="skills" onclick="switchTab('skills')">Skills</button>
-      <button class="etab" data-tab="languages" onclick="switchTab('languages')">Languages</button>
-      <button class="etab" data-tab="certificates" onclick="switchTab('certificates')">Certs</button>
-      <button class="etab" data-tab="hobbies" onclick="switchTab('hobbies')">Hobbies</button>
-      <button class="etab" data-tab="profile" onclick="switchTab('profile')">Profile</button>
-      <button class="etab" data-tab="experience" onclick="switchTab('experience')">Experience</button>
-      <button class="etab" data-tab="education" onclick="switchTab('education')">Education</button>
-      <button class="etab" data-tab="colors" onclick="switchTab('colors')">🎨 Colors</button>
-      <button class="etab" data-tab="layout" onclick="switchTab('layout')">📐 Layout</button>
+      <button class="etab active" data-tab="personal" data-tablabel="personal" onclick="switchTab('personal')">Personal</button>
+      <button class="etab" data-tab="skills" data-tablabel="skills" onclick="switchTab('skills')">Skills</button>
+      <button class="etab" data-tab="languages" data-tablabel="languages" onclick="switchTab('languages')">Languages</button>
+      <button class="etab" data-tab="certificates" data-tablabel="certificates" onclick="switchTab('certificates')">Certs</button>
+      <button class="etab" data-tab="hobbies" data-tablabel="hobbies" onclick="switchTab('hobbies')">Hobbies</button>
+      <button class="etab" data-tab="profile" data-tablabel="profile" onclick="switchTab('profile')">Profile</button>
+      <button class="etab" data-tab="experience" data-tablabel="experience" onclick="switchTab('experience')">Experience</button>
+      <button class="etab" data-tab="education" data-tablabel="education" onclick="switchTab('education')">Education</button>
+      <button class="etab" data-tab="colors" data-tablabel="colors" onclick="switchTab('colors')">🎨 Colors</button>
+      <button class="etab" data-tab="layout" data-tablabel="layout" onclick="switchTab('layout')">📐 Layout</button>
     </div>
     <div class="econtent" id="econtent"></div>
   </div>
@@ -257,22 +273,31 @@ a.cv-ci:hover{opacity:.8;text-decoration:underline;}
 </div>
 
 <div id="toast"></div>
+<div id="fitwarn">CV content exceeds A4. Reduce layout/font spacing before PDF.</div>
 
 <div id="itmodal">
   <div class="itbox">
     <div class="ithdr">
-      <h3>📋 Import CV from Text</h3>
-      <p>Paste plain CV text (from PDF copy, Word, LinkedIn export). Parser extracts name, contact, experience, education and more.</p>
+      <h3 data-ui="modalTitle">📋 Import CV from Text</h3>
+      <p data-ui="modalHelp">Paste plain CV text (from PDF copy, Word, LinkedIn export). Parser extracts name, contact, experience, education and more.</p>
     </div>
     <div class="itbody">
+      <div class="ittools">
+        <select id="it-mode" title="Choose how parsed data is applied">
+          <option value="replace" data-ui-option="replace">Replace detected sections</option>
+          <option value="merge" data-ui-option="merge">Merge into current CV</option>
+        </select>
+        <button class="it-mini" data-ui="example" onclick="loadImportExample()">Example</button>
+        <button class="it-mini" data-ui="clear" onclick="document.getElementById('it-ta').value='';document.getElementById('it-pv').style.display='none';document.getElementById('it-apply-btn').style.display='none'">Clear</button>
+      </div>
       <textarea id="it-ta" placeholder="Paste your CV text here…&#10;&#10;Simon Reimer&#10;Connectivity Engineer&#10;email@example.com&#10;&#10;EXPERIENCE&#10;Jul 2025 – Present&#10;Connectivity Engineer&#10;Siemens AG&#10;- Bullet 1"></textarea>
       <div id="it-pv"></div>
     </div>
     <div class="itftr">
-      <span class="hint">💡 Parse first, review results, then Apply.</span>
-      <button class="it-cancel" onclick="closeIT()">Cancel</button>
-      <button class="it-parse" onclick="runParse()">🔍 Parse</button>
-      <button class="it-apply" id="it-apply-btn" onclick="applyParsed()">✓ Apply to CV</button>
+      <span class="hint" data-ui="modalHint">💡 Parse first, review results, then Apply.</span>
+      <button class="it-cancel" data-ui="cancel" onclick="closeIT()">Cancel</button>
+      <button class="it-parse" data-ui="parse" onclick="runParse()">🔍 Parse</button>
+      <button class="it-apply" id="it-apply-btn" data-ui="apply" onclick="applyParsed()">✓ Apply to CV</button>
     </div>
   </div>
 </div>
@@ -291,7 +316,8 @@ let D = {
     linkedinUrl:"https://www.linkedin.com/in/simon-reimer-08676a169/",
     github:"sreimer94",
     githubUrl:"https://github.com/sreimer94",
-    photo:"1758657829217.jpg"
+    photo:"1758657829217.jpg",
+    showPhoto:true
   },
   skills:{
     technical:["BACnet","Python","Modbus","Modbus TCP","KNX","M-Bus"],
@@ -364,6 +390,22 @@ let D = {
   ]
 };
 
+const DEFAULT_D=JSON.parse(JSON.stringify(D));
+const BLANK_D={
+  personal:{name:"",title:"",location:"",email:"",phone:"",base:"",linkedin:"",linkedinUrl:"",github:"",githubUrl:"",photo:"",showPhoto:false,photoSize:74,photoX:50,photoY:50},
+  skills:{technical:[],tools:[],domain:[],soft:[]},
+  languages:[],
+  certificates:[],
+  showCerts:true,
+  profile:"",
+  profileMode:"multi",
+  profileItalic:true,
+  experience:[],
+  education:[],
+  hobbies:[],
+  showHobbies:true
+};
+
 // ── TRANSLATIONS ──────────────────────────────────────────────────────────────
 const TR={
   en:{skills:"SKILLS",languages:"LANGUAGES",certificates:"CERTIFICATES",hobbies:"HOBBIES",
@@ -388,8 +430,112 @@ const TR={
       email:"✉",phone:"☏",base:"⌖",ln:"in",gh:"⌥"}
 };
 
+const UI={
+  en:{autoSave:"Auto-save",undo:"↶ Undo",redo:"↷ Redo",save:"💾 Save",importText:"📋 Import Text",importJson:"↑ Import JSON",exportJson:"↓ Export JSON",reset:"Reset",pdf:"📄 Create PDF",
+      personal:"Personal",skills:"Skills",languages:"Languages",certificates:"Certs",hobbies:"Hobbies",profile:"Profile",experience:"Experience",education:"Education",colors:"🎨 Colors",layout:"📐 Layout",
+      modalTitle:"📋 Import CV from Text",modalHelp:"Paste plain CV text from PDF, Word or LinkedIn. The parser extracts contact, profile, experience, education, skills and languages.",
+      replace:"Replace detected sections",merge:"Merge into current CV",example:"Example",clear:"Clear",modalHint:"💡 Parse first, review results, then apply.",cancel:"Cancel",parse:"🔍 Parse",apply:"✓ Apply to CV",
+      fitwarn:"CV content exceeds A4. Reduce layout/font spacing before PDF.",saved:"💾 Saved to browser storage",autosaveOn:"Auto-save enabled",autosaveOff:"Auto-save disabled",resetAsk:"Clear saved browser data and start with an empty CV?",resetDone:"Saved data cleared"},
+  de:{autoSave:"Auto-Speichern",undo:"↶ Rückgängig",redo:"↷ Wiederholen",save:"💾 Speichern",importText:"📋 Text importieren",importJson:"↑ JSON importieren",exportJson:"↓ JSON exportieren",reset:"Zurücksetzen",pdf:"📄 PDF erstellen",
+      personal:"Person",skills:"Skills",languages:"Sprachen",certificates:"Zertifikate",hobbies:"Hobbys",profile:"Profil",experience:"Erfahrung",education:"Ausbildung",colors:"🎨 Farben",layout:"📐 Layout",
+      modalTitle:"📋 Lebenslauf aus Text importieren",modalHelp:"Füge reinen CV-Text aus PDF, Word oder LinkedIn ein. Der Parser erkennt Kontakt, Profil, Erfahrung, Ausbildung, Skills und Sprachen.",
+      replace:"Erkannte Bereiche ersetzen",merge:"In aktuellen CV zusammenführen",example:"Beispiel",clear:"Leeren",modalHint:"💡 Erst parsen, Ergebnis prüfen, dann übernehmen.",cancel:"Abbrechen",parse:"🔍 Parsen",apply:"✓ In CV übernehmen",
+      fitwarn:"CV-Inhalt überschreitet A4. Layout/Schrift vor PDF reduzieren.",saved:"💾 Im Browser gespeichert",autosaveOn:"Auto-Speichern aktiv",autosaveOff:"Auto-Speichern aus",resetAsk:"Gespeicherte Browser-Daten löschen und mit leerem CV starten?",resetDone:"Gespeicherte Daten gelöscht"},
+  es:{autoSave:"Auto-guardar",undo:"↶ Deshacer",redo:"↷ Rehacer",save:"💾 Guardar",importText:"📋 Importar texto",importJson:"↑ Importar JSON",exportJson:"↓ Exportar JSON",reset:"Restablecer",pdf:"📄 Crear PDF",
+      personal:"Personal",skills:"Competencias",languages:"Idiomas",certificates:"Certificados",hobbies:"Aficiones",profile:"Perfil",experience:"Experiencia",education:"Educación",colors:"🎨 Colores",layout:"📐 Diseño",
+      modalTitle:"📋 Importar CV desde texto",modalHelp:"Pega texto del CV desde PDF, Word o LinkedIn. El parser extrae contacto, perfil, experiencia, educación, habilidades e idiomas.",
+      replace:"Reemplazar secciones detectadas",merge:"Fusionar con el CV actual",example:"Ejemplo",clear:"Borrar",modalHint:"💡 Primero analiza, revisa el resultado y luego aplica.",cancel:"Cancelar",parse:"🔍 Analizar",apply:"✓ Aplicar al CV",
+      fitwarn:"El contenido supera A4. Reduce diseño/fuente antes del PDF.",saved:"💾 Guardado en el navegador",autosaveOn:"Auto-guardar activo",autosaveOff:"Auto-guardar desactivado",resetAsk:"¿Borrar los datos guardados y empezar con un CV vacío?",resetDone:"Datos guardados borrados"},
+  fr:{autoSave:"Auto-save",undo:"↶ Annuler",redo:"↷ Rétablir",save:"💾 Enregistrer",importText:"📋 Importer texte",importJson:"↑ Importer JSON",exportJson:"↓ Exporter JSON",reset:"Réinitialiser",pdf:"📄 Créer PDF",
+      personal:"Personnel",skills:"Compétences",languages:"Langues",certificates:"Certificats",hobbies:"Loisirs",profile:"Profil",experience:"Expérience",education:"Formation",colors:"🎨 Couleurs",layout:"📐 Mise en page",
+      modalTitle:"📋 Importer un CV depuis du texte",modalHelp:"Colle le texte du CV depuis PDF, Word ou LinkedIn. Le parser extrait contact, profil, expérience, formation, compétences et langues.",
+      replace:"Remplacer les sections détectées",merge:"Fusionner avec le CV actuel",example:"Exemple",clear:"Effacer",modalHint:"💡 Analyse d'abord, vérifie le résultat, puis applique.",cancel:"Annuler",parse:"🔍 Analyser",apply:"✓ Appliquer au CV",
+      fitwarn:"Le contenu dépasse A4. Réduis mise en page/police avant le PDF.",saved:"💾 Enregistré dans le navigateur",autosaveOn:"Auto-save activé",autosaveOff:"Auto-save désactivé",resetAsk:"Effacer les données enregistrées et commencer avec un CV vide ?",resetDone:"Données enregistrées effacées"}
+};
+const ED={
+  en:{photo:"Photo",showPhoto:"Show photo in CV",size:"Size",posX:"Position X",posY:"Position Y",name:"Full Name",job:"Job Title",headLoc:"Location (header display)",contact:"Contact",email:"Email",phone:"Phone",base:"Base Location",liText:"LinkedIn display",liUrl:"LinkedIn URL",ghText:"GitHub display",ghUrl:"GitHub URL",
+      lang:"Language",level:"Level",addLang:"+ Add Language",showCerts:"Show certificates in CV",title:"Title",issuer:"Issuer",date:"Date",addCert:"+ Add Certificate",summary:"Profile / Summary",display:"Display",single:"― Single line",multi:"≡ Multi-line",italic:"Italic text",fontSize:"Font size",profileSize:"Profile size",
+      sortDate:"⇅ Sort by date",start:"Start",end:"End",current:"Current position",company:"Company · Location",bullets:"Bullet points (one per line)",addPos:"+ Add Position",showHobbies:"Show hobbies in CV",addHobby:"+ Add hobby",degree:"Degree / Program",school:"School / Institution",addEdu:"+ Add Education"},
+  de:{photo:"Foto",showPhoto:"Foto im CV anzeigen",size:"Größe",posX:"Position X",posY:"Position Y",name:"Vollständiger Name",job:"Position / Titel",headLoc:"Ort im Header",contact:"Kontakt",email:"E-Mail",phone:"Telefon",base:"Standort",liText:"LinkedIn Anzeige",liUrl:"LinkedIn URL",ghText:"GitHub Anzeige",ghUrl:"GitHub URL",
+      lang:"Sprache",level:"Niveau",addLang:"+ Sprache hinzufügen",showCerts:"Zertifikate im CV anzeigen",title:"Titel",issuer:"Aussteller",date:"Datum",addCert:"+ Zertifikat hinzufügen",summary:"Profil / Zusammenfassung",display:"Darstellung",single:"― Einzeilig",multi:"≡ Mehrzeilig",italic:"Kursiv",fontSize:"Schriftgröße",profileSize:"Profilgröße",
+      sortDate:"⇅ Nach Datum sortieren",start:"Start",end:"Ende",current:"Aktuelle Position",company:"Firma · Ort",bullets:"Bulletpoints (eine Zeile pro Punkt)",addPos:"+ Position hinzufügen",showHobbies:"Hobbys im CV anzeigen",addHobby:"+ Hobby hinzufügen",degree:"Abschluss / Programm",school:"Schule / Institution",addEdu:"+ Ausbildung hinzufügen"},
+  es:{photo:"Foto",showPhoto:"Mostrar foto en el CV",size:"Tamaño",posX:"Posición X",posY:"Posición Y",name:"Nombre completo",job:"Puesto",headLoc:"Ubicación del encabezado",contact:"Contacto",email:"Email",phone:"Teléfono",base:"Ubicación base",liText:"LinkedIn visible",liUrl:"LinkedIn URL",ghText:"GitHub visible",ghUrl:"GitHub URL",
+      lang:"Idioma",level:"Nivel",addLang:"+ Añadir idioma",showCerts:"Mostrar certificados en el CV",title:"Título",issuer:"Emisor",date:"Fecha",addCert:"+ Añadir certificado",summary:"Perfil / Resumen",display:"Vista",single:"― Una línea",multi:"≡ Varias líneas",italic:"Cursiva",fontSize:"Tamaño de fuente",profileSize:"Tamaño del perfil",
+      sortDate:"⇅ Ordenar por fecha",start:"Inicio",end:"Fin",current:"Puesto actual",company:"Empresa · Ubicación",bullets:"Puntos (uno por línea)",addPos:"+ Añadir puesto",showHobbies:"Mostrar aficiones en el CV",addHobby:"+ Añadir afición",degree:"Título / Programa",school:"Escuela / Institución",addEdu:"+ Añadir educación"},
+  fr:{photo:"Photo",showPhoto:"Afficher la photo dans le CV",size:"Taille",posX:"Position X",posY:"Position Y",name:"Nom complet",job:"Poste",headLoc:"Lieu dans l'en-tête",contact:"Contact",email:"E-mail",phone:"Téléphone",base:"Lieu de base",liText:"LinkedIn affiché",liUrl:"LinkedIn URL",ghText:"GitHub affiché",ghUrl:"GitHub URL",
+      lang:"Langue",level:"Niveau",addLang:"+ Ajouter une langue",showCerts:"Afficher les certificats dans le CV",title:"Titre",issuer:"Émetteur",date:"Date",addCert:"+ Ajouter un certificat",summary:"Profil / Résumé",display:"Affichage",single:"― Une ligne",multi:"≡ Multiligne",italic:"Italique",fontSize:"Taille de police",profileSize:"Taille du profil",
+      sortDate:"⇅ Trier par date",start:"Début",end:"Fin",current:"Poste actuel",company:"Entreprise · Lieu",bullets:"Points (un par ligne)",addPos:"+ Ajouter un poste",showHobbies:"Afficher les loisirs dans le CV",addHobby:"+ Ajouter un loisir",degree:"Diplôme / Programme",school:"École / Institution",addEdu:"+ Ajouter une formation"}
+};
+
 let lang='en', tab='personal', editorOpen=true, parsedData=null;
+let autoSaveEnabled=true, booting=true, saveTimer=null;
+let undoStack=[], redoStack=[], lastSnapshot='';
 let LAYOUT={sidebarWidth:219, fsHeader:100, fsHdrName:100, fsHdrContact:100, fsProfile:100, fsLeft:100, fsRight:100, fsSkills:100, fsLangs:100, fsCerts:100, fsExp:100, fsEdu:100, spacingR:100, spacingL:100};
+
+function clone(o){return JSON.parse(JSON.stringify(o));}
+function stateSnapshot(){return JSON.stringify({D,LAYOUT,COLORS,lang});}
+function restoreSnapshot(s){
+  const st=JSON.parse(s);
+  D=normalizeData(st.D||DEFAULT_D);
+  LAYOUT=validateLayout(st.LAYOUT||LAYOUT);
+  COLORS={...THEMES.se,...(st.COLORS||{})};
+  lang=st.lang||lang;
+  document.querySelectorAll('.lbtn').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));
+  applyColors(); applyLayout(); renderEditor(); updateHistoryButtons(); queueSave();
+}
+function rememberState(){
+  const snap=stateSnapshot();
+  if(snap===lastSnapshot) return;
+  undoStack.push(lastSnapshot||snap);
+  undoStack=undoStack.slice(-40);
+  redoStack=[];
+  lastSnapshot=snap;
+  updateHistoryButtons();
+}
+function updateHistoryButtons(){
+  const u=document.getElementById('undoBtn'), r=document.getElementById('redoBtn');
+  if(u) u.disabled=!undoStack.length;
+  if(r) r.disabled=!redoStack.length;
+}
+function undoChange(){
+  if(!undoStack.length) return;
+  redoStack.push(stateSnapshot());
+  const snap=undoStack.pop();
+  lastSnapshot=snap;
+  restoreSnapshot(snap);
+  showToast('↶ Undo');
+}
+function redoChange(){
+  if(!redoStack.length) return;
+  undoStack.push(stateSnapshot());
+  const snap=redoStack.pop();
+  lastSnapshot=snap;
+  restoreSnapshot(snap);
+  showToast('↷ Redo');
+}
+function ui(key){return (UI[lang]&&UI[lang][key])||UI.en[key]||key;}
+function ed(key){return (ED[lang]&&ED[lang][key])||ED.en[key]||key;}
+function applyUI(){
+  document.documentElement.lang=lang;
+  document.querySelectorAll('[data-ui]').forEach(el=>{
+    const key=el.dataset.ui;
+    if(UI[lang]&&UI[lang][key]) el.textContent=UI[lang][key];
+  });
+  document.querySelectorAll('[data-tablabel]').forEach(el=>{
+    const key=el.dataset.tablabel;
+    if(UI[lang]&&UI[lang][key]) el.textContent=UI[lang][key];
+  });
+  document.querySelectorAll('[data-ui-option]').forEach(opt=>{
+    const key=opt.dataset.uiOption;
+    if(UI[lang]&&UI[lang][key]) opt.textContent=UI[lang][key];
+  });
+  const auto=document.querySelector('.tb-check');
+  if(auto) auto.childNodes[auto.childNodes.length-1].textContent=' '+ui('autoSave');
+  const fw=document.getElementById('fitwarn');
+  if(fw) fw.textContent=ui('fitwarn');
+  const ta=document.getElementById('it-ta');
+  if(ta) ta.placeholder=`${ui('modalTitle').replace('📋 ','')}\n\nSimon Reimer\nConnectivity Engineer\nemail@example.com\n\n${TR[lang].experience}\nJul 2025 – ${TR[lang].present}\nConnectivity Engineer\nSiemens AG\n- Bullet 1`;
+}
 
 function fitCV(){
   const pp=document.getElementById('pp');
@@ -526,9 +672,10 @@ function renderCV(){
   const ppx=d.personal.photoX!=null?d.personal.photoX:50;
   const ppy=d.personal.photoY!=null?d.personal.photoY:50;
   const pDim=`width:${psz}px;height:${psz}px`;
-  const photo=d.personal.photo
+  const showPhoto=d.personal.showPhoto!==false;
+  const photo=showPhoto&&d.personal.photo
     ?`<img class="cv-photo" style="${pDim};object-position:${ppx}% ${ppy}%" src="${esc(d.personal.photo)}" alt="" onerror="this.style.display='none';this.nextSibling.style.display='flex'">`:'';
-  const photoPh=`<div class="cv-photo-ph" style="${pDim};font-size:${(psz/74*1.7).toFixed(2)}em${d.personal.photo?';display:none':''}">👤</div>`;
+  const photoPh=showPhoto?`<div class="cv-photo-ph" style="${pDim};font-size:${(psz/74*1.7).toFixed(2)}em${d.personal.photo?';display:none':''}">👤</div>`:'';
 
   const ci=(icon,val,href)=>val
     ?(href?`<a href="${href}" target="_blank" rel="noopener" class="cv-ci"><i>${icon}</i>${esc(val)}</a>`
@@ -656,6 +803,8 @@ function renderCV(){
         </div>
       </div>
     </div>`;
+  queueSave();
+  requestAnimationFrame(checkFit);
 }
 
 // ── EDITOR HTML ───────────────────────────────────────────────────────────────
@@ -668,47 +817,65 @@ function renderEditor(){
   c.appendChild(div);
 }
 
+document.addEventListener('focusin',e=>{
+  if(booting) return;
+  if(e.target.matches('#ep input,#ep textarea,#ep select,#it-ta,#it-mode')) rememberState();
+},true);
+document.addEventListener('click',e=>{
+  if(booting) return;
+  const el=e.target.closest('button,input[type="checkbox"],input[type="range"]');
+  if(!el) return;
+  if(el.closest('#ep')||el.closest('#itmodal')||el.id==='autoSave') rememberState();
+},true);
+
 const EH={
   personal(){
     const p=D.personal;
+    const show=p.showPhoto!==false;
     return `
+      <label class="chk-row" style="margin-bottom:10px;font-weight:700">
+        <input type="checkbox" ${show?'checked':''} onchange="D.personal.showPhoto=this.checked;renderEditor();renderCV()">
+        ${ed('showPhoto')}
+      </label>
+      <div style="opacity:${show?1:.45};pointer-events:${show?'auto':'none'}">
       <div class="photo-area" onclick="document.getElementById('phIn').click()">
         ${p.photo?`<img src="${esc(p.photo)}" onerror="this.style.display='none';this.nextSibling.style.display='block'"><span class="ph-txt" style="display:none">📷 Click</span>`:'<span class="ph-txt">📷<br>Click to add</span>'}
       </div>
       <input type="file" id="phIn" accept="image/*" style="display:none" onchange="uploadPhoto(event)">
-      <div class="sdiv">Foto</div>
+      <div class="sdiv">${ed('photo')}</div>
       <div class="slider-row">
-        <label>Größe</label>
+        <label>${ed('size')}</label>
         <input type="range" min="40" max="120" step="2" value="${p.photoSize||74}"
           oninput="D.personal.photoSize=+this.value;document.getElementById('slv-psz').textContent=this.value+'px';renderCV()">
         <span class="slider-val" id="slv-psz">${p.photoSize||74}px</span>
       </div>
       <div class="slider-row">
-        <label>Position X</label>
+        <label>${ed('posX')}</label>
         <input type="range" min="0" max="100" step="5" value="${p.photoX!=null?p.photoX:50}"
           oninput="D.personal.photoX=+this.value;document.getElementById('slv-px').textContent=this.value+'%';renderCV()">
         <span class="slider-val" id="slv-px">${p.photoX!=null?p.photoX:50}%</span>
       </div>
       <div class="slider-row">
-        <label>Position Y</label>
+        <label>${ed('posY')}</label>
         <input type="range" min="0" max="100" step="5" value="${p.photoY!=null?p.photoY:50}"
           oninput="D.personal.photoY=+this.value;document.getElementById('slv-py').textContent=this.value+'%';renderCV()">
         <span class="slider-val" id="slv-py">${p.photoY!=null?p.photoY:50}%</span>
       </div>
-      <div class="fg"><label>Full Name</label><input value="${esc(p.name)}" oninput="D.personal.name=this.value;renderCV()"></div>
-      <div class="fg"><label>Job Title</label><input value="${esc(p.title)}" oninput="D.personal.title=this.value;renderCV()"></div>
-      <div class="fg"><label>Location (header display)</label><input value="${esc(p.location)}" oninput="D.personal.location=this.value;renderCV()"></div>
-      <div class="sdiv">Contact</div>
-      <div class="fg"><label>Email</label><input type="email" value="${esc(p.email)}" oninput="D.personal.email=this.value;renderCV()"></div>
-      <div class="fg"><label>Phone</label><input type="tel" value="${esc(p.phone)}" oninput="D.personal.phone=this.value;renderCV()"></div>
-      <div class="fg"><label>Base Location</label><input value="${esc(p.base)}" oninput="D.personal.base=this.value;renderCV()"></div>
+      </div>
+      <div class="fg"><label>${ed('name')}</label><input value="${esc(p.name)}" oninput="D.personal.name=this.value;renderCV()"></div>
+      <div class="fg"><label>${ed('job')}</label><input value="${esc(p.title)}" oninput="D.personal.title=this.value;renderCV()"></div>
+      <div class="fg"><label>${ed('headLoc')}</label><input value="${esc(p.location)}" oninput="D.personal.location=this.value;renderCV()"></div>
+      <div class="sdiv">${ed('contact')}</div>
+      <div class="fg"><label>${ed('email')}</label><input type="email" value="${esc(p.email)}" oninput="D.personal.email=this.value;renderCV()"></div>
+      <div class="fg"><label>${ed('phone')}</label><input type="tel" value="${esc(p.phone)}" oninput="D.personal.phone=this.value;renderCV()"></div>
+      <div class="fg"><label>${ed('base')}</label><input value="${esc(p.base)}" oninput="D.personal.base=this.value;renderCV()"></div>
       <div class="g2">
-        <div class="fg" style="margin:0"><label>LinkedIn (Anzeigetext)</label><input placeholder="Benutzername" value="${esc(p.linkedin)}" oninput="D.personal.linkedin=this.value;renderCV()"></div>
-        <div class="fg" style="margin:0"><label>LinkedIn URL</label><input placeholder="https://www.linkedin.com/in/…" value="${esc(p.linkedinUrl||'')}" oninput="D.personal.linkedinUrl=this.value;renderCV()"></div>
+        <div class="fg" style="margin:0"><label>${ed('liText')}</label><input placeholder="Benutzername" value="${esc(p.linkedin)}" oninput="D.personal.linkedin=this.value;renderCV()"></div>
+        <div class="fg" style="margin:0"><label>${ed('liUrl')}</label><input placeholder="https://www.linkedin.com/in/…" value="${esc(p.linkedinUrl||'')}" oninput="D.personal.linkedinUrl=this.value;renderCV()"></div>
       </div>
       <div class="g2" style="margin-top:8px">
-        <div class="fg" style="margin:0"><label>GitHub (Anzeigetext)</label><input placeholder="Benutzername" value="${esc(p.github)}" oninput="D.personal.github=this.value;renderCV()"></div>
-        <div class="fg" style="margin:0"><label>GitHub URL</label><input placeholder="https://github.com/…" value="${esc(p.githubUrl||'')}" oninput="D.personal.githubUrl=this.value;renderCV()"></div>
+        <div class="fg" style="margin:0"><label>${ed('ghText')}</label><input placeholder="Benutzername" value="${esc(p.github)}" oninput="D.personal.github=this.value;renderCV()"></div>
+        <div class="fg" style="margin:0"><label>${ed('ghUrl')}</label><input placeholder="https://github.com/…" value="${esc(p.githubUrl||'')}" oninput="D.personal.githubUrl=this.value;renderCV()"></div>
       </div>`;
   },
   skills(){
@@ -739,28 +906,28 @@ const EH={
           </div>
         </div>
         <div class="g2">
-          <div class="fg" style="margin:0"><label>Language</label><input value="${esc(l.name)}" oninput="D.languages[${i}].name=this.value;renderCV()"></div>
-          <div class="fg" style="margin:0"><label>Level</label><select onchange="D.languages[${i}].level=this.value;renderCV()">${opts}</select></div>
+          <div class="fg" style="margin:0"><label>${ed('lang')}</label><input value="${esc(l.name)}" oninput="D.languages[${i}].name=this.value;renderCV()"></div>
+          <div class="fg" style="margin:0"><label>${ed('level')}</label><select onchange="D.languages[${i}].level=this.value;renderCV()">${opts}</select></div>
         </div>
       </div>`;}).join('')}</div>
-      <button class="addbtn" onclick="D.languages.push({name:'New Language',level:'B1'});renderEditor();renderCV()">+ Add Language</button>`;
+      <button class="addbtn" onclick="D.languages.push({name:'New Language',level:'B1'});renderEditor();renderCV()">${ed('addLang')}</button>`;
   },
   certificates(){
     const show=D.showCerts!==false;
     return `
       <label class="chk-row" style="margin-bottom:10px;font-weight:700">
         <input type="checkbox" ${show?'checked':''} onchange="D.showCerts=this.checked;renderEditor();renderCV()">
-        Zertifikate im CV anzeigen
+        ${ed('showCerts')}
       </label>
       <div style="opacity:${show?1:.4};pointer-events:${show?'auto':'none'}">
         <div>${D.certificates.map((c,i)=>`
           <div class="card">
             <div class="card-hdr"><span class="card-ttl">${esc(c.title)}</span><button class="delbtn" onclick="D.certificates.splice(${i},1);renderEditor();renderCV()">×</button></div>
-            <div class="fg"><label>Title</label><input value="${esc(c.title)}" oninput="D.certificates[${i}].title=this.value;renderCV()"></div>
-            <div class="fg"><label>Issuer</label><input value="${esc(c.issuer)}" oninput="D.certificates[${i}].issuer=this.value;renderCV()"></div>
-            <div class="fg"><label>Date</label><input value="${esc(c.date)}" oninput="D.certificates[${i}].date=this.value;renderCV()"></div>
+            <div class="fg"><label>${ed('title')}</label><input value="${esc(c.title)}" oninput="D.certificates[${i}].title=this.value;renderCV()"></div>
+            <div class="fg"><label>${ed('issuer')}</label><input value="${esc(c.issuer)}" oninput="D.certificates[${i}].issuer=this.value;renderCV()"></div>
+            <div class="fg"><label>${ed('date')}</label><input value="${esc(c.date)}" oninput="D.certificates[${i}].date=this.value;renderCV()"></div>
           </div>`).join('')}</div>
-        <button class="addbtn" onclick="D.certificates.push({title:'New Certificate',issuer:'Issuer',date:'2025'});renderEditor();renderCV()">+ Add Certificate</button>
+        <button class="addbtn" onclick="D.certificates.push({title:'New Certificate',issuer:'Issuer',date:'2025'});renderEditor();renderCV()">${ed('addCert')}</button>
       </div>`;
   },
   profile(){
@@ -768,21 +935,21 @@ const EH={
     const isMulti=D.profileMode==='multi';
     const fsP=LAYOUT.fsProfile||100;
     return `
-      <div class="fg"><label>Profile / Summary</label><textarea style="min-height:160px" oninput="D.profile=this.value;renderCV()">${esc(D.profile)}</textarea></div>
-      <div class="sdiv">Darstellung</div>
+      <div class="fg"><label>${ed('summary')}</label><textarea style="min-height:160px" oninput="D.profile=this.value;renderCV()">${esc(D.profile)}</textarea></div>
+      <div class="sdiv">${ed('display')}</div>
       <div style="display:flex;gap:6px;margin-bottom:10px">
         <button style="flex:1;padding:7px;border-radius:5px;border:2px solid ${!isMulti?'var(--p)':'var(--border)'};background:${!isMulti?'var(--p)':'white'};color:${!isMulti?'white':'var(--mid)'};font-size:.78em;font-weight:700;cursor:pointer"
-          onclick="D.profileMode='single';renderEditor();renderCV()">― Einzeilig</button>
+          onclick="D.profileMode='single';renderEditor();renderCV()">${ed('single')}</button>
         <button style="flex:1;padding:7px;border-radius:5px;border:2px solid ${isMulti?'var(--p)':'var(--border)'};background:${isMulti?'var(--p)':'white'};color:${isMulti?'white':'var(--mid)'};font-size:.78em;font-weight:700;cursor:pointer"
-          onclick="D.profileMode='multi';renderEditor();renderCV()">≡ Mehrzeilig</button>
+          onclick="D.profileMode='multi';renderEditor();renderCV()">${ed('multi')}</button>
       </div>
       <label class="chk-row">
         <input type="checkbox" ${isItalic?'checked':''} onchange="D.profileItalic=this.checked;renderCV()">
-        Italic text
+        ${ed('italic')}
       </label>
-      <div class="sdiv">Schriftgröße</div>
+      <div class="sdiv">${ed('fontSize')}</div>
       <div class="slider-row">
-        <label>Profile Größe</label>
+        <label>${ed('profileSize')}</label>
         <input type="range" min="60" max="140" step="5" value="${fsP}"
           oninput="LAYOUT.fsProfile=+this.value;document.getElementById('slv-pfs').textContent=this.value+'%';applyLayout()">
         <span class="slider-val" id="slv-pfs">${fsP}%</span>
@@ -791,7 +958,7 @@ const EH={
   experience(){
     const n=D.experience.length;
     return `
-      <button class="addbtn" style="margin-bottom:8px" onclick="sortByDate(D.experience,true)">⇅ Nach Datum sortieren</button>
+      <button class="addbtn" style="margin-bottom:8px" onclick="sortByDate(D.experience,true)">${ed('sortDate')}</button>
       <div>${D.experience.map((e,i)=>`
       <div class="card">
         <div class="card-hdr">
@@ -803,15 +970,15 @@ const EH={
           </div>
         </div>
         <div class="g2">
-          <div class="fg" style="margin:0"><label>Start</label><input value="${esc(e.start)}" placeholder="Jul 2025" oninput="D.experience[${i}].start=this.value;renderCV()"></div>
-          <div class="fg" style="margin:0"><label>End</label><input value="${esc(e.end)}" placeholder="Jun 2026" oninput="D.experience[${i}].end=this.value;renderCV()"></div>
+          <div class="fg" style="margin:0"><label>${ed('start')}</label><input value="${esc(e.start)}" placeholder="Jul 2025" oninput="D.experience[${i}].start=this.value;renderCV()"></div>
+          <div class="fg" style="margin:0"><label>${ed('end')}</label><input value="${esc(e.end)}" placeholder="Jun 2026" oninput="D.experience[${i}].end=this.value;renderCV()"></div>
         </div>
-        <label class="chk-row"><input type="checkbox" ${e.current?'checked':''} onchange="D.experience[${i}].current=this.checked;renderCV()"> Current position</label>
-        <div class="fg"><label>Job Title</label><input value="${esc(e.title)}" oninput="D.experience[${i}].title=this.value;renderCV()"></div>
-        <div class="fg"><label>Company · Location</label><input value="${esc(e.company)}" oninput="D.experience[${i}].company=this.value;renderCV()"></div>
-        <div class="fg"><label>Bullet Points (one per line)</label><textarea oninput="D.experience[${i}].bullets=this.value.split('\\n').filter(l=>l.trim()!='');renderCV()">${esc((e.bullets||[]).join('\n'))}</textarea></div>
+        <label class="chk-row"><input type="checkbox" ${e.current?'checked':''} onchange="D.experience[${i}].current=this.checked;renderCV()"> ${ed('current')}</label>
+        <div class="fg"><label>${ed('job')}</label><input value="${esc(e.title)}" oninput="D.experience[${i}].title=this.value;renderCV()"></div>
+        <div class="fg"><label>${ed('company')}</label><input value="${esc(e.company)}" oninput="D.experience[${i}].company=this.value;renderCV()"></div>
+        <div class="fg"><label>${ed('bullets')}</label><textarea oninput="D.experience[${i}].bullets=this.value.split('\\n').filter(l=>l.trim()!='');renderCV()">${esc((e.bullets||[]).join('\n'))}</textarea></div>
       </div>`).join('')}</div>
-      <button class="addbtn" onclick="D.experience.unshift({id:Date.now(),start:'',end:'',current:false,title:'New Position',subtitle:'',company:'',bullets:[]});renderEditor();renderCV()">+ Add Position</button>`;
+      <button class="addbtn" onclick="D.experience.unshift({id:Date.now(),start:'',end:'',current:false,title:'New Position',subtitle:'',company:'',bullets:[]});renderEditor();renderCV()">${ed('addPos')}</button>`;
   },
   hobbies(){
     const show=D.showHobbies!==false;
@@ -820,7 +987,7 @@ const EH={
     return `
       <label class="chk-row" style="margin-bottom:10px;font-weight:700">
         <input type="checkbox" ${show?'checked':''} onchange="D.showHobbies=this.checked;renderEditor();renderCV()">
-        Hobbies im CV anzeigen
+        ${ed('showHobbies')}
       </label>
       <div style="opacity:${show?1:.4};pointer-events:${show?'auto':'none'}">
         <div>${hobbies.map((h,i)=>{
@@ -840,13 +1007,13 @@ const EH={
               <input value="${esc(cur)}" oninput="setHobbyLang(${i},'${lang}',this.value)">
             </div>
           </div>`;}).join('')}</div>
-        <button class="addbtn" onclick="addHobby()">+ Hobby hinzufügen</button>
+        <button class="addbtn" onclick="addHobby()">${ed('addHobby')}</button>
       </div>`;
   },
   education(){
     const n=D.education.length;
     return `
-      <button class="addbtn" style="margin-bottom:8px" onclick="sortByDate(D.education,true)">⇅ Nach Datum sortieren</button>
+      <button class="addbtn" style="margin-bottom:8px" onclick="sortByDate(D.education,true)">${ed('sortDate')}</button>
       <div>${D.education.map((e,i)=>`
       <div class="card">
         <div class="card-hdr">
@@ -858,13 +1025,13 @@ const EH={
           </div>
         </div>
         <div class="g2">
-          <div class="fg" style="margin:0"><label>Start</label><input value="${esc(e.start)}" oninput="D.education[${i}].start=this.value;renderCV()"></div>
-          <div class="fg" style="margin:0"><label>End</label><input value="${esc(e.end)}" oninput="D.education[${i}].end=this.value;renderCV()"></div>
+          <div class="fg" style="margin:0"><label>${ed('start')}</label><input value="${esc(e.start)}" oninput="D.education[${i}].start=this.value;renderCV()"></div>
+          <div class="fg" style="margin:0"><label>${ed('end')}</label><input value="${esc(e.end)}" oninput="D.education[${i}].end=this.value;renderCV()"></div>
         </div>
-        <div class="fg"><label>Degree / Program</label><input value="${esc(e.degree)}" oninput="D.education[${i}].degree=this.value;renderCV()"></div>
-        <div class="fg"><label>School / Institution</label><input value="${esc(e.school)}" oninput="D.education[${i}].school=this.value;renderCV()"></div>
+        <div class="fg"><label>${ed('degree')}</label><input value="${esc(e.degree)}" oninput="D.education[${i}].degree=this.value;renderCV()"></div>
+        <div class="fg"><label>${ed('school')}</label><input value="${esc(e.school)}" oninput="D.education[${i}].school=this.value;renderCV()"></div>
       </div>`).join('')}</div>
-      <button class="addbtn" onclick="D.education.unshift({id:Date.now(),start:'',end:'',degree:'New Degree',school:'Institution'});renderEditor();renderCV()">+ Add Education</button>`;
+      <button class="addbtn" onclick="D.education.unshift({id:Date.now(),start:'',end:'',degree:'New Degree',school:'Institution'});renderEditor();renderCV()">${ed('addEdu')}</button>`;
   }
 };
 
@@ -1006,6 +1173,8 @@ function switchTab(t){
 function setLang(l){
   lang=l;
   document.querySelectorAll('.lbtn').forEach(b=>b.classList.toggle('active',b.dataset.lang===l));
+  applyUI();
+  renderEditor();
   renderCV();
 }
 function toggleEditor(){
@@ -1018,12 +1187,36 @@ function toggleEditor(){
 }
 
 // ── IMPORT / EXPORT JSON ──────────────────────────────────────────────────────
+function mergeDeep(base,incoming){
+  if(Array.isArray(base)) return Array.isArray(incoming)?incoming:base;
+  if(!base||typeof base!=='object') return incoming!==undefined?incoming:base;
+  const out={...base};
+  if(incoming&&typeof incoming==='object'){
+    Object.keys(incoming).forEach(k=>{
+      out[k]=mergeDeep(base[k],incoming[k]);
+    });
+  }
+  return out;
+}
+function normalizeData(input){
+  const out=mergeDeep(BLANK_D,input||{});
+  out.personal=out.personal||clone(DEFAULT_D.personal);
+  out.skills=mergeDeep(DEFAULT_D.skills,out.skills||{});
+  out.languages=Array.isArray(out.languages)?out.languages:[];
+  out.certificates=Array.isArray(out.certificates)?out.certificates:[];
+  out.experience=Array.isArray(out.experience)?out.experience:[];
+  out.education=Array.isArray(out.education)?out.education:[];
+  out.hobbies=Array.isArray(out.hobbies)?out.hobbies:[];
+  return out;
+}
 function exportJSON(){
-  const blob=new Blob([JSON.stringify(D,null,2)],{type:'application/json'});
+  const payload={version:2,exportedAt:new Date().toISOString(),language:lang,cv:D,layout:LAYOUT,colors:COLORS};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
   a.download=`cv_${D.personal.name.replace(/\s+/g,'_')}_${lang}.json`;
   a.click(); URL.revokeObjectURL(a.href);
+  showToast('↓ JSON exported');
 }
 function loadJSONFile(f){
   if(!f||!f.name.endsWith('.json')) return showToast('⚠ Nur .json Dateien erlaubt');
@@ -1031,9 +1224,13 @@ function loadJSONFile(f){
   r.onload=e=>{
     try{
       const parsed=JSON.parse(e.target.result);
-      if(parsed.personal) D=parsed;
-      else throw new Error('Kein gültiges CV-JSON');
-      renderEditor(); renderCV();
+      const imported=parsed.cv||parsed;
+      if(!imported.personal) throw new Error('Kein gültiges CV-JSON');
+      rememberState();
+      D=normalizeData(imported);
+      if(parsed.layout) LAYOUT=validateLayout(parsed.layout);
+      if(parsed.colors) COLORS={...THEMES.se,...parsed.colors};
+      applyColors(); applyLayout(); renderEditor(); renderCV();
       showToast('✓ '+f.name+' geladen');
     }catch(err){showToast('⚠ '+err.message);}
   };
@@ -1074,22 +1271,64 @@ function runParse(){
   parsedData=parseRawCV(raw);
   showParsePreview(parsedData);
 }
+function loadImportExample(){
+  document.getElementById('it-ta').value=`Simon Reimer
+Connectivity Engineer · Building Automation
+Freiburg ↔ Renens, CH
+sreimer94@gmail.com
++41 79 785 52 65
+
+PROFILE
+Connectivity Engineer with deep field experience and a software mindset.
+
+EXPERIENCE
+Jul 2025 – Present
+Connectivity Engineer
+Siemens Schweiz AG · Renens, Vaud, Switzerland
+- Project Lead for Energy Monitoring
+- Tool development — EDE Manager, ModbusTCP Creator
+
+EDUCATION
+May 2017 – Jun 2018
+Master Electrician — Electrical Engineering
+Handwerkskammer Ostwestfalen-Lippe zu Bielefeld
+
+LANGUAGES
+German Native
+English C2
+
+SKILLS
+Technical: BACnet, Python, Modbus, KNX
+Tools: VS Code, MSIB`;
+  document.getElementById('it-pv').style.display='none';
+  document.getElementById('it-apply-btn').style.display='none';
+}
 function applyParsed(){
   if(!parsedData) return;
   const p=parsedData;
+  const mode=document.getElementById('it-mode').value;
+  rememberState();
   if(p.personal) Object.keys(p.personal).forEach(k=>{if(p.personal[k]) D.personal[k]=p.personal[k];});
   if(p.profile) D.profile=p.profile;
-  if(p.experience&&p.experience.length) D.experience=p.experience;
-  if(p.education&&p.education.length) D.education=p.education;
-  if(p.skills){['technical','tools','domain','soft'].forEach(k=>{if(p.skills[k]&&p.skills[k].length) D.skills[k]=p.skills[k];});}
-  if(p.languages&&p.languages.length) D.languages=p.languages;
-  if(p.certificates&&p.certificates.length) D.certificates=p.certificates;
+  if(mode==='merge'){
+    if(p.experience&&p.experience.length) D.experience=[...p.experience,...D.experience];
+    if(p.education&&p.education.length) D.education=[...p.education,...D.education];
+    if(p.skills){['technical','tools','domain','soft'].forEach(k=>{if(p.skills[k]&&p.skills[k].length) D.skills[k]=[...new Set([...(D.skills[k]||[]),...p.skills[k]])];});}
+    if(p.languages&&p.languages.length) D.languages=[...p.languages,...D.languages.filter(l=>!p.languages.some(x=>x.name.toLowerCase()===l.name.toLowerCase()))];
+    if(p.certificates&&p.certificates.length) D.certificates=[...p.certificates,...D.certificates];
+  }else{
+    if(p.experience&&p.experience.length) D.experience=p.experience;
+    if(p.education&&p.education.length) D.education=p.education;
+    if(p.skills){['technical','tools','domain','soft'].forEach(k=>{if(p.skills[k]&&p.skills[k].length) D.skills[k]=p.skills[k];});}
+    if(p.languages&&p.languages.length) D.languages=p.languages;
+    if(p.certificates&&p.certificates.length) D.certificates=p.certificates;
+  }
   closeIT(); renderEditor(); renderCV();
 }
 function showParsePreview(p){
   const pv=document.getElementById('it-pv');
   const ok=(lbl,v)=>`<div class="prv-ok">✓ <strong>${lbl}:</strong> ${esc(String(v))}</div>`;
-  const no=(lbl)=>`<div class="prv-warn">— ${lbl}: not detected</div>`;
+  const no=(lbl)=>`<div class="prv-warn">— ${lbl}: ${lang==='de'?'nicht erkannt':lang==='fr'?'non détecté':lang==='es'?'no detectado':'not detected'}</div>`;
   let rows=[];
   if(p.personal){
     if(p.personal.name) rows.push(ok('Name',p.personal.name));
@@ -1104,7 +1343,8 @@ function showParsePreview(p){
   if(sc) rows.push(ok('Skills',sc+' items'));
   if(p.languages&&p.languages.length) rows.push(ok('Languages',p.languages.map(l=>l.name).join(', ')));
   if(p.certificates&&p.certificates.length) rows.push(ok('Certificates',p.certificates.length+' found'));
-  pv.innerHTML=`<h4>Parse Results</h4>${rows.join('')}`;
+  const title=lang==='de'?'Parse-Ergebnis':lang==='fr'?'Résultat':lang==='es'?'Resultado':'Parse Results';
+  pv.innerHTML=`<h4>${title}</h4>${rows.join('')}`;
   pv.style.display='block';
   document.getElementById('it-apply-btn').style.display='inline-block';
 }
@@ -1256,17 +1496,49 @@ function showToast(msg){
   t.textContent=msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2200);
 }
+function queueSave(){
+  if(booting||!autoSaveEnabled) return;
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>saveData(true),450);
+}
+function setAutoSave(on){
+  autoSaveEnabled=!!on;
+  localStorage.setItem('cvAutoSave',autoSaveEnabled?'1':'0');
+  if(autoSaveEnabled) saveData(true);
+  showToast(autoSaveEnabled?ui('autosaveOn'):ui('autosaveOff'));
+}
+function checkFit(){
+  const warn=document.getElementById('fitwarn');
+  const cv=document.getElementById('cv');
+  if(!warn||!cv) return;
+  const overflowing=cv.scrollHeight>cv.clientHeight+3||cv.scrollWidth>cv.clientWidth+3;
+  warn.classList.toggle('show',overflowing);
+}
+function resetToDefault(){
+  if(!confirm(ui('resetAsk'))) return;
+  rememberState();
+  ['cvData','cvLayout','cvColors','cvLang'].forEach(k=>localStorage.removeItem(k));
+  D=clone(BLANK_D);
+  resetLayout();
+  COLORS={...THEMES.se};
+  applyColors();
+  applyUI();
+  renderEditor(); renderCV();
+  saveData(true);
+  showToast(ui('resetDone'));
+}
 function resetLayout(){
   LAYOUT={sidebarWidth:219,fsHeader:100,fsHdrName:100,fsHdrContact:100,fsProfile:100,fsLeft:100,fsRight:100,fsSkills:100,fsLangs:100,fsCerts:100,fsExp:100,fsEdu:100,spacingR:100,spacingL:100};
   applyLayout();
   if(tab==='layout') renderEditor();
 }
-function saveData(){
+function saveData(silent=false){
   try{
     localStorage.setItem('cvData',JSON.stringify(D));
     localStorage.setItem('cvLayout',JSON.stringify(LAYOUT));
     localStorage.setItem('cvColors',JSON.stringify(COLORS));
-    showToast('💾 Saved to browser storage');
+    localStorage.setItem('cvLang',lang);
+    if(!silent) showToast(ui('saved'));
   }catch(e){showToast('⚠ Save failed: '+e.message);}
 }
 function validateLayout(saved){
@@ -1284,9 +1556,13 @@ function loadData(){
     const d=localStorage.getItem('cvData');
     const l=localStorage.getItem('cvLayout');
     const c=localStorage.getItem('cvColors');
-    if(d) D=JSON.parse(d);
+    const lng=localStorage.getItem('cvLang');
+    const as=localStorage.getItem('cvAutoSave');
+    if(d) D=normalizeData(JSON.parse(d));
     if(l) LAYOUT=validateLayout(JSON.parse(l));
     if(c){ COLORS={...THEMES.se,...JSON.parse(c)}; }
+    if(lng&&TR[lng]) lang=lng;
+    if(as!==null) autoSaveEnabled=as==='1';
   }catch(e){console.warn('Load failed',e);}
 }
 
@@ -1311,7 +1587,14 @@ window.addEventListener('afterprint',restoreAfterPrint);
 loadData();
 applyColors();
 applyLayout();
+applyUI();
 renderEditor();
+document.querySelectorAll('.lbtn').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));
+const asBox=document.getElementById('autoSave');
+if(asBox) asBox.checked=autoSaveEnabled;
+lastSnapshot=stateSnapshot();
+booting=false;
+updateHistoryButtons();
 requestAnimationFrame(()=>requestAnimationFrame(fitCV));
 </script>
 </body>
