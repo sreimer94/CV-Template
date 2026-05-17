@@ -456,7 +456,9 @@ function setLangColor(i,val){
   if(hex) hex.textContent=val;
 }
 function applyTheme(name){
+  const prevLangs=COLORS.langs?[...COLORS.langs]:null;
   COLORS={...THEMES[name]};
+  if(prevLangs) COLORS.langs=prevLangs;
   applyColors();
   if(tab==='colors') renderEditor();
 }
