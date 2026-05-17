@@ -838,15 +838,15 @@ const EH={
               </div>
             </div>
             <div class="g2">
-              <div class="fg" style="margin:0"><label>EN</label><input value="${esc(en)}" oninput="if(typeof D.hobbies[${i}]==='string')D.hobbies[${i}]={en:D.hobbies[${i}],de:D.hobbies[${i}],es:D.hobbies[${i}],fr:D.hobbies[${i}]};D.hobbies[${i}].en=this.value;renderCV()"></div>
-              <div class="fg" style="margin:0"><label>DE</label><input value="${esc(de)}" oninput="if(typeof D.hobbies[${i}]==='string')D.hobbies[${i}]={en:D.hobbies[${i}],de:D.hobbies[${i}],es:D.hobbies[${i}],fr:D.hobbies[${i}]};D.hobbies[${i}].de=this.value;renderCV()"></div>
+              <div class="fg" style="margin:0"><label>EN</label><input value="${esc(en)}" oninput="setHobbyLang(${i},'en',this.value)"></div>
+              <div class="fg" style="margin:0"><label>DE</label><input value="${esc(de)}" oninput="setHobbyLang(${i},'de',this.value)"></div>
             </div>
             <div class="g2" style="margin-top:8px">
-              <div class="fg" style="margin:0"><label>ES</label><input value="${esc(es)}" oninput="if(typeof D.hobbies[${i}]==='string')D.hobbies[${i}]={en:D.hobbies[${i}],de:D.hobbies[${i}],es:D.hobbies[${i}],fr:D.hobbies[${i}]};D.hobbies[${i}].es=this.value;renderCV()"></div>
-              <div class="fg" style="margin:0"><label>FR</label><input value="${esc(fr)}" oninput="if(typeof D.hobbies[${i}]==='string')D.hobbies[${i}]={en:D.hobbies[${i}],de:D.hobbies[${i}],es:D.hobbies[${i}],fr:D.hobbies[${i}]};D.hobbies[${i}].fr=this.value;renderCV()"></div>
+              <div class="fg" style="margin:0"><label>ES</label><input value="${esc(es)}" oninput="setHobbyLang(${i},'es',this.value)"></div>
+              <div class="fg" style="margin:0"><label>FR</label><input value="${esc(fr)}" oninput="setHobbyLang(${i},'fr',this.value)"></div>
             </div>
           </div>`;}).join('')}</div>
-        <button class="addbtn" onclick="D.hobbies.push({en:'New Hobby',de:'Neues Hobby',es:'Nuevo hobby',fr:'Nouveau loisir'});renderEditor();renderCV()">+ Hobby hinzufügen</button>
+        <button class="addbtn" onclick="addHobby()">+ Hobby hinzufügen</button>
       </div>`;
   },
   education(){
@@ -973,6 +973,20 @@ EH.layout=function(){
     <button class="reset-btn" onclick="resetLayout()">↺ Reset All Layout</button>`;
 };
 // ── SKILL TAGS ────────────────────────────────────────────────────────────────
+function addHobby(){
+  if(!D.hobbies) D.hobbies=[];
+  D.hobbies.push({en:'New Hobby',de:'Neues Hobby',es:'Nuevo hobby',fr:'Nouveau loisir'});
+  renderEditor(); renderCV();
+}
+function setHobbyLang(i,lng,val){
+  if(!D.hobbies||!D.hobbies[i]) return;
+  if(typeof D.hobbies[i]==='string'){
+    const s=D.hobbies[i];
+    D.hobbies[i]={en:s,de:s,es:s,fr:s};
+  }
+  D.hobbies[i][lng]=val;
+  renderCV();
+}
 function rmSkill(key,val){D.skills[key]=D.skills[key].filter(s=>s!==val);renderEditor();renderCV();}
 function addSkill(e,key){
   if(e.key!=='Enter'&&e.key!==',') return;
