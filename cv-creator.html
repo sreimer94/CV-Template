@@ -105,6 +105,9 @@ a.cv-ci:hover{opacity:.8;text-decoration:underline;}
 .cv-pbar-body{flex:1;min-width:0;display:flex;align-items:center;gap:10px;}
 .cv-pbar-lbl{font-size:calc(.38em * var(--fs-profile));font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--p);white-space:nowrap;flex-shrink:0;}
 .cv-pbar-txt{font-size:calc(.66em * var(--fs-profile));color:#2a3a4a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;}
+.cv-pbar.multi{height:auto;padding:calc(9px * var(--fs-profile)) 20px;align-items:flex-start;}
+.cv-pbar.multi .cv-pbar-body{align-items:flex-start;}
+.cv-pbar.multi .cv-pbar-txt{white-space:pre-line;overflow:visible;text-overflow:clip;line-height:1.5;}
 
 /* Body */
 .cv-body{display:flex;flex:1;overflow:hidden;}
@@ -547,7 +550,8 @@ function renderCV(){
       <div class="cv-cert-dt">${esc(c.date)}</div>
     </div>`).join('');
 
-  const profileText=d.profile.split('\n').filter(l=>l.trim()).join(' ');
+  const profileMulti=d.profileMode==='multi';
+  const profileText=profileMulti?d.profile.trim():d.profile.split('\n').filter(l=>l.trim()).join(' ');
 
   const exp=d.experience.map(e=>{
     const dateStr=`${fmtD(e.start)} - ${e.current?tr.present:fmtD(e.end)}`;
@@ -586,7 +590,7 @@ function renderCV(){
       </div>
       <div class="cv-hdr-right">${contact}</div>
     </div>
-    <div class="cv-pbar">
+    <div class="cv-pbar${profileMulti?' multi':''}">
       <div class="cv-pbar-body">
         <div class="cv-pbar-txt" style="font-style:${d.profileItalic===false?'normal':'italic'}">${esc(profileText)}</div>
       </div>
@@ -707,9 +711,17 @@ const EH={
   },
   profile(){
     const isItalic=D.profileItalic!==false;
+    const isMulti=D.profileMode==='multi';
     const fsP=LAYOUT.fsProfile||100;
     return `
       <div class="fg"><label>Profile / Summary</label><textarea style="min-height:160px" oninput="D.profile=this.value;renderCV()">${esc(D.profile)}</textarea></div>
+      <div class="sdiv">Darstellung</div>
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <button style="flex:1;padding:7px;border-radius:5px;border:2px solid ${!isMulti?'var(--p)':'var(--border)'};background:${!isMulti?'var(--p)':'white'};color:${!isMulti?'white':'var(--mid)'};font-size:.78em;font-weight:700;cursor:pointer"
+          onclick="D.profileMode='single';renderEditor();renderCV()">― Einzeilig</button>
+        <button style="flex:1;padding:7px;border-radius:5px;border:2px solid ${isMulti?'var(--p)':'var(--border)'};background:${isMulti?'var(--p)':'white'};color:${isMulti?'white':'var(--mid)'};font-size:.78em;font-weight:700;cursor:pointer"
+          onclick="D.profileMode='multi';renderEditor();renderCV()">≡ Mehrzeilig</button>
+      </div>
       <label class="chk-row">
         <input type="checkbox" ${isItalic?'checked':''} onchange="D.profileItalic=this.checked;renderCV()">
         Italic text
