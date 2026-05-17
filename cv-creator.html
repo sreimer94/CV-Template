@@ -125,6 +125,8 @@ a.cv-ci:hover{opacity:.8;text-decoration:underline;}
 .cv-lang-lvl{font-size:.55em;font-weight:700;letter-spacing:1px;color:var(--orange);text-transform:uppercase;}
 .cv-lang-bar{height:3px;background:rgba(255,255,255,.18);border-radius:2px;}
 .cv-lang-fill{height:100%;border-radius:2px;}
+.cv-hobby-item{display:flex;align-items:center;gap:6px;font-size:.7em;color:rgba(255,255,255,.85);margin-bottom:5px;line-height:1.3;}
+.cv-hobby-dot{width:5px;height:5px;border-radius:50%;background:var(--orange);flex-shrink:0;}
 .cv-cert-card{background:rgba(255,255,255,.08);border-radius:4px;padding:7px 10px;margin-bottom:5px;border-left:3px solid var(--orange);}
 .cv-cert-ttl{font-size:.67em;font-weight:700;color:white;line-height:1.3;}
 .cv-cert-iss{font-size:.55em;color:rgba(255,255,255,.6);line-height:1.25;margin-top:2px;}
@@ -235,6 +237,7 @@ a.cv-ci:hover{opacity:.8;text-decoration:underline;}
       <button class="etab" data-tab="skills" onclick="switchTab('skills')">Skills</button>
       <button class="etab" data-tab="languages" onclick="switchTab('languages')">Languages</button>
       <button class="etab" data-tab="certificates" onclick="switchTab('certificates')">Certs</button>
+      <button class="etab" data-tab="hobbies" onclick="switchTab('hobbies')">Hobbies</button>
       <button class="etab" data-tab="profile" onclick="switchTab('profile')">Profile</button>
       <button class="etab" data-tab="experience" onclick="switchTab('experience')">Experience</button>
       <button class="etab" data-tab="education" onclick="switchTab('education')">Education</button>
@@ -352,27 +355,28 @@ let D = {
      school:"Berufskolleg Lübbecke"},
     {id:3,start:"Aug 2007",end:"Jul 2011",degree:"Secondary School Diploma (Realschulabschluss)",
      school:"Städtische Realschule Preußisch Oldendorf"}
-  ]
+  ],
+  hobbies:["Cycling","3D Printing","Home Automation","Photography"]
 };
 
 // ── TRANSLATIONS ──────────────────────────────────────────────────────────────
 const TR={
-  en:{skills:"SKILLS",languages:"LANGUAGES",certificates:"CERTIFICATES",
+  en:{skills:"SKILLS",languages:"LANGUAGES",certificates:"CERTIFICATES",hobbies:"HOBBIES",
       profile:"PROFILE",experience:"EXPERIENCE",education:"EDUCATION",
       present:"PRESENT",native:"NATIVE",
       technical:"TECHNICAL",tools:"TOOL",domain:"DOMAIN",soft:"SOFT",
       email:"✉",phone:"☏",base:"⌖",ln:"in",gh:"⌥"},
-  de:{skills:"FÄHIGKEITEN",languages:"SPRACHEN",certificates:"ZERTIFIKATE",
+  de:{skills:"FÄHIGKEITEN",languages:"SPRACHEN",certificates:"ZERTIFIKATE",hobbies:"HOBBYS",
       profile:"PROFIL",experience:"BERUFSERFAHRUNG",education:"AUSBILDUNG",
       present:"HEUTE",native:"MUTTERSPRACHE",
       technical:"TECHNICAL",tools:"TOOL",domain:"DOMAIN",soft:"SOFT",
       email:"✉",phone:"☏",base:"⌖",ln:"in",gh:"⌥"},
-  es:{skills:"COMPETENCIAS",languages:"IDIOMAS",certificates:"CERTIFICADOS",
+  es:{skills:"COMPETENCIAS",languages:"IDIOMAS",certificates:"CERTIFICADOS",hobbies:"AFICIONES",
       profile:"PERFIL",experience:"EXPERIENCIA",education:"EDUCACIÓN",
       present:"PRESENTE",native:"NATIVO",
       technical:"TÉCNICO",tools:"HERRAMIENTAS",domain:"DOMINIO",soft:"HABILIDADES",
       email:"✉",phone:"☏",base:"⌖",ln:"in",gh:"⌥"},
-  fr:{skills:"COMPÉTENCES",languages:"LANGUES",certificates:"CERTIFICATIONS",
+  fr:{skills:"COMPÉTENCES",languages:"LANGUES",certificates:"CERTIFICATIONS",hobbies:"LOISIRS",
       profile:"PROFIL",experience:"EXPÉRIENCE",education:"FORMATION",
       present:"PRÉSENT",native:"LANGUE MATERNELLE",
       technical:"TECHNIQUE",tools:"OUTILS",domain:"DOMAINE",soft:"SAVOIR-ÊTRE",
@@ -627,6 +631,10 @@ function renderCV(){
           <div class="cv-sh">${tr.languages}</div>
           ${langs}
         </div>
+        ${(d.showHobbies!==false&&d.hobbies&&d.hobbies.length)?`<div class="cv-mod" style="font-size:calc(1em*var(--fs-left))">
+          <div class="cv-sh">${tr.hobbies}</div>
+          ${d.hobbies.map(h=>`<div class="cv-hobby-item"><div class="cv-hobby-dot"></div>${esc(h)}</div>`).join('')}
+        </div>`:''}
         ${d.showCerts!==false?`<div class="cv-mod" style="font-size:calc(1em*var(--fs-certs))">
           <div class="cv-sh">${tr.certificates}</div>
           ${certs}
@@ -800,6 +808,23 @@ const EH={
       </div>`).join('')}</div>
       <button class="addbtn" onclick="D.experience.unshift({id:Date.now(),start:'',end:'',current:false,title:'New Position',subtitle:'',company:'',bullets:[]});renderEditor();renderCV()">+ Add Position</button>`;
   },
+  hobbies(){
+    const show=D.showHobbies!==false;
+    return `
+      <label class="chk-row" style="margin-bottom:10px;font-weight:700">
+        <input type="checkbox" ${show?'checked':''} onchange="D.showHobbies=this.checked;renderEditor();renderCV()">
+        Hobbies im CV anzeigen
+      </label>
+      <div style="opacity:${show?1:.4};pointer-events:${show?'auto':'none'}">
+        <div class="fg">
+          <label>Hobbies</label>
+          <div class="tags-wrap">
+            ${(D.hobbies||[]).map(v=>`<span class="tag">${esc(v)}<span class="tx" onclick="D.hobbies.splice(D.hobbies.indexOf('${esc(v)}'),1);renderEditor();renderCV()">×</span></span>`).join('')}
+            <input class="tinput" placeholder="Eingabe + Enter…" onkeydown="addHobby(event)">
+          </div>
+        </div>
+      </div>`;
+  },
   education(){
     const n=D.education.length;
     return `
@@ -930,6 +955,13 @@ function addSkill(e,key){
   e.preventDefault();
   const v=e.target.value.trim().replace(/,$/,'');
   if(v&&!D.skills[key].includes(v)){D.skills[key].push(v);renderEditor();renderCV();}
+}
+function addHobby(e){
+  if(e.key!=='Enter'&&e.key!==',') return;
+  e.preventDefault();
+  const v=e.target.value.trim().replace(/,$/,'');
+  if(!D.hobbies) D.hobbies=[];
+  if(v&&!D.hobbies.includes(v)){D.hobbies.push(v);renderEditor();renderCV();}
 }
 
 // ── PHOTO ─────────────────────────────────────────────────────────────────────
