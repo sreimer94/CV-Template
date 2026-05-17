@@ -177,6 +177,10 @@ a.cv-ci:hover{opacity:.8;text-decoration:underline;}
 /* TOAST */
 #toast{position:fixed;bottom:20px;right:20px;background:#1d1741;color:white;padding:9px 16px;border-radius:7px;font-size:.82em;font-weight:600;z-index:9999;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;}
 #toast.show{opacity:1;transform:translateY(0);}
+/* DRAG & DROP */
+#pp.drag-over{outline:3px dashed var(--p);outline-offset:-6px;}
+#pp.drag-over::after{content:'JSON ablegen';position:absolute;inset:0;background:rgba(0,180,160,.18);display:flex;align-items:center;justify-content:center;font-size:1.4em;font-weight:700;color:var(--p);pointer-events:none;}
+#pp{position:relative;}
 
 /* LAYOUT TAB */
 .slider-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
@@ -879,12 +883,37 @@ function exportJSON(){
   a.download=`cv_${D.personal.name.replace(/\s+/g,'_')}_${lang}.json`;
   a.click(); URL.revokeObjectURL(a.href);
 }
-function importJSON(ev){
-  const f=ev.target.files[0]; if(!f) return;
+function loadJSONFile(f){
+  if(!f||!f.name.endsWith('.json')) return showToast('⚠ Nur .json Dateien erlaubt');
   const r=new FileReader();
-  r.onload=e=>{try{D=JSON.parse(e.target.result);renderEditor();renderCV();}catch{alert('Invalid JSON file.');}};
-  r.readAsText(f); ev.target.value='';
+  r.onload=e=>{
+    try{
+      const parsed=JSON.parse(e.target.result);
+      if(parsed.personal) D=parsed;
+      else throw new Error('Kein gültiges CV-JSON');
+      renderEditor(); renderCV();
+      showToast('✓ '+f.name+' geladen');
+    }catch(err){showToast('⚠ '+err.message);}
+  };
+  r.readAsText(f);
 }
+function importJSON(ev){loadJSONFile(ev.target.files[0]); ev.target.value='';}
+
+// drag & drop JSON onto preview
+(function(){
+  const pp=document.getElementById('pp');
+  pp.addEventListener('dragover',e=>{
+    if([...e.dataTransfer.items].some(i=>i.kind==='file')){
+      e.preventDefault(); pp.classList.add('drag-over');
+    }
+  });
+  pp.addEventListener('dragleave',e=>{if(!pp.contains(e.relatedTarget)) pp.classList.remove('drag-over');});
+  pp.addEventListener('drop',e=>{
+    e.preventDefault(); pp.classList.remove('drag-over');
+    const f=e.dataTransfer.files[0];
+    if(f) loadJSONFile(f);
+  });
+})();
 
 // ── IMPORT TEXT MODAL ─────────────────────────────────────────────────────────
 function openIT(){
